@@ -14,31 +14,5 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-(ns dda.pallet.dda-smeagol-crate.infra
-  (:require
-    [schema.core :as s]))
+(ns integration.src.dda.pallet.dda-smeagol-crate.app.instantiate_existing)
 
-(def facility :dda-smeagol)
-
-(def SmeagolInfra
-  {:repo-download-source s/Str
-   :tomcat-xmx-megabyte s/Num})
-
-(s/defmethod core-infra/dda-init facility
-  [dda-crate config])
-
-(s/defmethod core-infra/dda-install facility
-  [core-infra config])
-
-(s/defmethod core-infra/dda-configure facility
-  [core-infra config])
-
-(s/defmethod core-infra/dda-test facility
-  [core-infra config])
-
-(def dda-smeagol-crate
-  (core-infra/make-dda-crate-infra
-    :facility facility))
-
-(def with-smeagol
-  (core-infra/create-infra-plan dda-smeagol-crate))

@@ -14,31 +14,13 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-(ns dda.pallet.dda-smeagol-crate.infra
+(ns dda.pallet.dda-smeagol-crate.domain.smeagol
   (:require
     [schema.core :as s]))
 
-(def facility :dda-smeagol)
-
-(def SmeagolInfra
-  {:repo-download-source s/Str
-   :tomcat-xmx-megabyte s/Num})
-
-(s/defmethod core-infra/dda-init facility
-  [dda-crate config])
-
-(s/defmethod core-infra/dda-install facility
-  [core-infra config])
-
-(s/defmethod core-infra/dda-configure facility
-  [core-infra config])
-
-(s/defmethod core-infra/dda-test facility
-  [core-infra config])
-
-(def dda-smeagol-crate
-  (core-infra/make-dda-crate-infra
-    :facility facility))
-
-(def with-smeagol
-  (core-infra/create-infra-plan dda-smeagol-crate))
+(s/defn tomcat-domain-configuration
+  [domain-config :- SmeagolDomainConfig]
+  (let [{:keys [tomcat-xmx-megabyte] :or {tomcat-xmx-megabyte 2560}} domain-config]
+    {:app-server
+     {:xmx-megabyte tomcat-xmx-megabyte            ; e.g. 6072 or 2560
+      }}))

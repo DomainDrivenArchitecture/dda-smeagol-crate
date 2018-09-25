@@ -14,31 +14,29 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-(ns dda.pallet.dda-smeagol-crate.infra
+(ns dda.pallet.dda-smeagol-crate.infra.smeagol
   (:require
-    [schema.core :as s]))
+    [pallet.actions :as actions]))
 
-(def facility :dda-smeagol)
+(defn smeagol-remote-file-unzip
+  "Unzip and install files from a zip from a URL"
+  [target-dir download-url 
+   & {:keys [owner mode]
+      :or {owner "tomcat7" mode "644"}}]
+  (actions/remote-directory
+    target-dir
+    :url download-url
+    :unpack :unzip
+    :recursive true
+    :owner owner
+    :group owner))
 
-(def SmeagolInfra
-  {:repo-download-source s/Str
-   :tomcat-xmx-megabyte s/Num})
+;TODO
+(s/defn smeagol-create-war
+  [config]
+  )
 
-(s/defmethod core-infra/dda-init facility
-  [dda-crate config])
-
-(s/defmethod core-infra/dda-install facility
-  [core-infra config])
-
-(s/defmethod core-infra/dda-configure facility
-  [core-infra config])
-
-(s/defmethod core-infra/dda-test facility
-  [core-infra config])
-
-(def dda-smeagol-crate
-  (core-infra/make-dda-crate-infra
-    :facility facility))
-
-(def with-smeagol
-  (core-infra/create-infra-plan dda-smeagol-crate))
+; TODO
+(s/defn install-smeagol
+  [config]
+  )

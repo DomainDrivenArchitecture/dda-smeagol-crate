@@ -14,15 +14,15 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-(ns main.src.dda.pallet.dda-smeagol-crate.app
+(ns dda.pallet.dda-smeagol-crate.app
   (:require
     [schema.core :as s]
     [dda.pallet.core.app :as core-app]
+    [dda.pallet.dda-tomcat-crate.app :as tomcat]
     [dda.pallet.dda-config-crate.infra :as config-crate]
     [dda.pallet.dda-smeagol-crate.infra :as infra]
     [dda.pallet.dda-smeagol-crate.domain :as domain]))
 
-;TODO: infra/with-smeagol
 (def with-smeagol infra/with-smeagol)
 
 (def InfraResult domain/InfraResult)
@@ -37,7 +37,12 @@
   [domain-config :- SmeagolDomain
    & options]
   (let [{:keys [group-key] :or {group-key infra/facility}} options]
-    {:group-specific-config {group-key (domain/infra-configuration domain-config)}}))
+    (mu/deep-merge
+      (tomcat/app-configuration
+         (domain/tomcat-domain-configuration resolved-domain-config) :group-key group-key)
+      {:group-specific-config 
+       {group-key 
+        (domain/infra-configuration domain-config)}})))
 
 (s/defmethod ^:always-validate
   core-app/group-spec infra/facility
