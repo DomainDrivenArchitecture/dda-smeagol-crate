@@ -31,7 +31,9 @@
 (def SmeagolDomain domain/SmeagolDomain)
 
 (def SmeagolAppConfig
-  {:group-specific-config {s/Keyword InfraResult}})
+  {:group-specific-config 
+   {s/Keyword (merge tomcat/InfraResult
+                     InfraResult)}})
 
 (s/defn ^:always-validate
   app-configuration :- SmeagolAppConfig

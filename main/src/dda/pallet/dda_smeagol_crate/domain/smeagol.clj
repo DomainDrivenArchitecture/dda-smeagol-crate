@@ -27,5 +27,7 @@
       }}))
 
 (s/defn smeagol-infra-configuration
-  [domain-config :- schema/SmeagolDomain]
-  {:repo-download-source "https://github.com/DomainDrivenArchitecture/smeagol/archive/master.zip"})
+  [domain-config :- schema/SmeagolDomain
+   facility :- s/Keyword]
+  {facility
+   {:repo-download-source "https://github.com/DomainDrivenArchitecture/smeagol/archive/master.zip"}})

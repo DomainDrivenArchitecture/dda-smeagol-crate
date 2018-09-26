@@ -33,4 +33,4 @@
 (s/defn ^:always-validate
   infra-configuration
   [domain-config :- SmeagolDomain]
-  (smeagol/smeagol-infra-configuration domain-config))
+  (smeagol/smeagol-infra-configuration domain-config infra/facility))
