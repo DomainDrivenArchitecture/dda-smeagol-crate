@@ -18,6 +18,7 @@
   (:require
     [schema.core :as s]
     [dda.pallet.core.app :as core-app]
+    [dda.config.commons.map-utils :as mu]
     [dda.pallet.dda-tomcat-crate.app :as tomcat]
     [dda.pallet.dda-config-crate.infra :as config-crate]
     [dda.pallet.dda-smeagol-crate.infra :as infra]
@@ -30,7 +31,7 @@
 (def SmeagolDomain domain/SmeagolDomain)
 
 (def SmeagolAppConfig
-  :group-specific-config {:s/Keyword InfraResult})
+  {:group-specific-config {s/Keyword InfraResult}})
 
 (s/defn ^:always-validate
   app-configuration :- SmeagolAppConfig
@@ -39,7 +40,7 @@
   (let [{:keys [group-key] :or {group-key infra/facility}} options]
     (mu/deep-merge
       (tomcat/app-configuration
-         (domain/tomcat-domain-configuration resolved-domain-config) :group-key group-key)
+         (domain/tomcat-domain-configuration domain-config) :group-key group-key)
       {:group-specific-config 
        {group-key 
         (domain/infra-configuration domain-config)}})))

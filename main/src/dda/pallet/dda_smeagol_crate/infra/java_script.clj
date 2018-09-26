@@ -38,7 +38,6 @@
 (s/defn
   init-nodejs
   [facility :- s/Keyword]
-  (let [{:keys [version]} config]
     (actions/as-action
       (logging/info (str facility "-init system: init-nodejs")))
     (actions/package-source (str "nodejs_8.x")
@@ -46,7 +45,7 @@
       {:url (str "https://deb.nodesource.com/node_8.x")
        ;:release "bionic"
        :scopes ["main"]
-       :key-url "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"})))
+       :key-url "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"}))
 
 (s/defn
   install-nodejs

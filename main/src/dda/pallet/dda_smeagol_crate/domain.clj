@@ -18,6 +18,7 @@
   (:require
     [schema.core :as s]
     [dda.pallet.dda-smeagol-crate.domain.schema :as schema]
+    [dda.pallet.dda-smeagol-crate.domain.smeagol :as smeagol]
     [dda.pallet.dda-smeagol-crate.infra :as infra]))
 
 (def SmeagolDomain schema/SmeagolDomain)
@@ -26,10 +27,10 @@
 
 (s/defn ^:always-validate
   tomcat-domain-configuration
-  [domain-config :- SmeagolDomainConfig]
+  [domain-config :- SmeagolDomain]
   (smeagol/tomcat-domain-configuration domain-config))
 
 (s/defn ^:always-validate
   infra-configuration
   [domain-config :- SmeagolDomain]
-  {})
+  (smeagol/smeagol-infra-configuration domain-config))

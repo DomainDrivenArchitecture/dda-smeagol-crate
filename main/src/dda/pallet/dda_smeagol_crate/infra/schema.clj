@@ -14,7 +14,9 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-(ns dda.pallet.dda-smeagol-crate.infra.schema)
+(ns dda.pallet.dda-smeagol-crate.infra.schema
+  (:require
+    [schema.core :as s]))
 
 (def SmeagolInfra
   {:repo-download-source s/Str})

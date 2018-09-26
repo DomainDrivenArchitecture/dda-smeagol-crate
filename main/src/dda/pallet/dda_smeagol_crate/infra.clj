@@ -17,6 +17,7 @@
 (ns dda.pallet.dda-smeagol-crate.infra
   (:require
     [schema.core :as s]
+    [dda.pallet.core.infra :as core-infra]
     [dda.pallet.dda-smeagol-crate.infra.schema :as schema]
     [dda.pallet.dda-smeagol-crate.infra.java-script :as js]
     [dda.pallet.dda-smeagol-crate.infra.clojure :as clj]))
