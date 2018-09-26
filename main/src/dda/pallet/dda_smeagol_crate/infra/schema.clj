@@ -14,22 +14,7 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-(ns dda.pallet.dda-smeagol-crate.domain
-  (:require
-    [schema.core :as s]
-    [dda.pallet.dda-smeagol-crate.domain.schema :as schema]
-    [dda.pallet.dda-smeagol-crate.infra :as infra]))
+(ns dda.pallet.dda-smeagol-crate.infra.schema)
 
-(def SmeagolDomain schema/SmeagolDomain)
-
-(def InfraResult {infra/facility infra/SmeagolInfra})
-
-(s/defn ^:always-validate
-  tomcat-domain-configuration
-  [domain-config :- SmeagolDomainConfig]
-  (smeagol/tomcat-domain-configuration domain-config))
-
-(s/defn ^:always-validate
-  infra-configuration
-  [domain-config :- SmeagolDomain]
-  {})
+(def SmeagolInfra
+  {:repo-download-source s/Str})

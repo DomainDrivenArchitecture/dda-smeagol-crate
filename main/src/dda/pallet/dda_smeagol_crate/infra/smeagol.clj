@@ -16,7 +16,8 @@
 
 (ns dda.pallet.dda-smeagol-crate.infra.smeagol
   (:require
-    [pallet.actions :as actions]))
+    [pallet.actions :as actions]
+    [dda.pallet.dda-smeagol-crate.infra.schema :as schema]))
 
 (defn smeagol-remote-file-unzip
   "Unzip and install files from a zip from a URL"
@@ -31,12 +32,22 @@
     :owner owner
     :group owner))
 
-;TODO
-(s/defn smeagol-create-war
-  [config]
-  )
+(def smeagol-location "/var/lib/smeagol/")
 
-; TODO
+(s/defn smeagol-create-war
+  [repo-location filename
+   & {:keys [owner]
+      :or {owner "tomcat7"}}]
+  (actions/exec-checked-script
+    (str "Create smeagol war file")
+    ("cd" ~repo-location "&&" "lein bower install")
+    ("cd" ~repo-location "&&" "lein ring uberwar" ~filename)
+    ))
+
+;TODO
 (s/defn install-smeagol
-  [config]
-  )
+  [config :- schema/SmeagolInfra]
+  (let [{:keys [repo-download-source]} config]
+    (smeagol-remote-file-unzip smeagol-location repo-download-source)
+    (smeagol-create-war smeagol-location "smeagol.war")
+    ))

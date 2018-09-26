@@ -16,11 +16,16 @@
 
 (ns dda.pallet.dda-smeagol-crate.domain.smeagol
   (:require
-    [schema.core :as s]))
+    [schema.core :as s]
+    [dda.pallet.dda-smeagol-crate.domain.schema :as schema]))
 
 (s/defn tomcat-domain-configuration
-  [domain-config :- SmeagolDomainConfig]
+  [domain-config :- schema/SmeagolDomain]
   (let [{:keys [tomcat-xmx-megabyte] :or {tomcat-xmx-megabyte 2560}} domain-config]
     {:app-server
      {:xmx-megabyte tomcat-xmx-megabyte            ; e.g. 6072 or 2560
       }}))
+
+(s/defn smeagol-infra-configuration
+  [domain-config :- schema/SmeagolDomain]
+  {:repo-download-source "https://github.com/DomainDrivenArchitecture/smeagol/archive/master.zip"})

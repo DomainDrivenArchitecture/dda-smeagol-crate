@@ -16,19 +16,23 @@
 
 (ns dda.pallet.dda-smeagol-crate.infra
   (:require
-    [schema.core :as s]))
+    [schema.core :as s]
+    [dda.pallet.dda-smeagol-crate.infra.schema :as schema]
+    [dda.pallet.dda-smeagol-crate.infra.java-script :as js]
+    [dda.pallet.dda-smeagol-crate.infra.clojure :as clj]))
 
 (def facility :dda-smeagol)
 
-(def SmeagolInfra
-  {:repo-download-source s/Str
-   :tomcat-xmx-megabyte s/Num})
+(def SmeagolInfra schema/SmeagolInfra)
 
 (s/defmethod core-infra/dda-init facility
-  [dda-crate config])
+  [core-infra config]
+  (js/init-system facility))
 
 (s/defmethod core-infra/dda-install facility
-  [core-infra config])
+  [core-infra config]
+  (clj/install-system facility)
+  (js/install-system facility))
 
 (s/defmethod core-infra/dda-configure facility
   [core-infra config])

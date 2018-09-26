@@ -14,5 +14,27 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-(ns integration.src.dda.pallet.dda-smeagol-crate.app.instantiate_existing)
+(ns dda.pallet.dda-smeagol-crate.app.instantiate_existing
+  (:require
+    [dda.pallet.core.app :as core-app]
+    [dda.pallet.dda-smeagol-crate.app :as app]))
 
+(defn install
+  [& options]
+  (let [{:keys [domain targets summarize-session]
+         :or {domain "smeagol.edn"
+              targets "targets.edn"
+              summarize-session true}} options]
+    (core-app/existing-install app/crate-app
+                               {:domain domain
+                                :targets targets})))
+
+(defn configure
+  [& options]
+  (let [{:keys [domain targets summarize-session]
+         :or {domain "smeagol.edn"
+              targets "targets.edn"
+              summarize-session true}} options]
+    (core-app/existing-install app/crate-app
+                               {:domain domain
+                                :targets targets})))
