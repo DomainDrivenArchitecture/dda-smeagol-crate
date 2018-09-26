@@ -17,7 +17,8 @@
 (ns dda.pallet.dda-smeagol-crate.infra.smeagol
   (:require
     [pallet.actions :as actions]
-    [dda.pallet.dda-smeagol-crate.infra.schema :as schema]))
+    [dda.pallet.dda-smeagol-crate.infra.schema :as schema]
+    [schema.core :as s]))
 
 (defn smeagol-remote-file-unzip
   "Unzip and install files from a zip from a URL"
