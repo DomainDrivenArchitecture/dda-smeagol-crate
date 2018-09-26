@@ -14,7 +14,7 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-(ns dda.pallet.dda-smeagol-crate.app.instantiate_existing
+(ns dda.pallet.dda-smeagol-crate.app.instantiate-existing
   (:require
     [dda.pallet.core.app :as core-app]
     [dda.pallet.dda-smeagol-crate.app :as app]))
