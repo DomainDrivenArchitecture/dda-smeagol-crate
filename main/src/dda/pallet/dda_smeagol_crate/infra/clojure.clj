@@ -24,8 +24,8 @@
 (defn install-java-8
   [facility]
   (actions/as-action
-    (logging/info (str facility "-install system: openjre-8")))
-  (actions/packages :aptitude ["openjdk-8-jre"]))
+    (logging/info (str facility "-install system: openjdk-8")))
+  (actions/packages :aptitude ["openjdk-8-jdk"]))
 
 (defn install-leiningen
   [facility]

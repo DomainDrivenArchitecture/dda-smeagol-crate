@@ -54,6 +54,7 @@
   (let [app-config (app-configuration domain-config)]
     (core-app/pallet-group-spec
       app-config [(config-crate/with-config app-config)
+                  tomcat/with-tomcat
                   with-smeagol])))
 
 (def crate-app (core-app/make-dda-crate-app

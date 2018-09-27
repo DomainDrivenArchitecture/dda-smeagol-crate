@@ -43,7 +43,7 @@
     (actions/package-source (str "nodejs_8.x")
       :aptitude
       {:url (str "https://deb.nodesource.com/node_8.x")
-       ;:release "bionic"
+       :release "bionic"
        :scopes ["main"]
        :key-url "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"}))
 
@@ -59,8 +59,9 @@
   [facility :- s/Keyword]
   (init-nodejs facility))
 
+;TODO: Fix npm dependency problem
 (s/defn install-system
   [facility :- s/Keyword]
   (install-nodejs facility)
-  (install-npm facility)
+  ;(install-npm facility)
   (install-bower facility))
