@@ -21,29 +21,25 @@
     [pallet.actions :as actions]
     [dda.pallet.crate.util :as util]))
 
+(defn install-java-8
+  [facility]
+  (actions/as-action
+    (logging/info (str facility "-install system: openjre-8")))
+  (actions/packages :aptitude ["openjdk-8-jre"]))
+
 (defn install-leiningen
   [facility]
   (actions/as-action
     (logging/info (str facility "-install system: leiningen")))
-  "get and install lein at /opt/leiningen"
-  (actions/directory
-    "/opt/leiningen"
-    :owner "root"
-    :group "users"
-    :mode "755")
+  "get and install lein at /bin/"
   (actions/remote-file
-    "/opt/leiningen/lein"
+    "/bin/lein"
     :owner "root"
     :group "users"
     :mode "755"
-    :url "https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein")
-  (actions/remote-file
-    "/etc/profile.d/lein.sh"
-    :literal true
-    :content
-    (util/create-file-content
-      ["PATH=$PATH:/opt/leiningen"])))
+    :url "https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein"))
 
 (s/defn install-system
   [facility :- s/Keyword]
+  (install-java-8 facility)
   (install-leiningen facility))
