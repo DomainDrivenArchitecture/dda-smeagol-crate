@@ -35,20 +35,29 @@
 
 (def smeagol-location "/var/lib/smeagol/")
 (def smeagol-dir "smeagol-master/")
+(def tomcat8-location "/var/lib/tomcat8/")
+(def tomcat-webapps (str tomcat8-location "webapps/"))
 
-(s/defn smeagol-create-war
+(defn smeagol-create-war
   [repo-location filename]
   (actions/exec-checked-script
     (str "Create smeagol war file")
     ("cd" ~repo-location "&&" "lein bower install")
-    ("cd" ~repo-location "&&" "lein ring uberwar" ~filename)
-    ))
+    ("cd" ~repo-location "&&" "lein ring uberwar" ~filename)))
+
+(defn deploy-smeagol
+  [smeagol-war-file-location tomcat-webapps-location]
+  (actions/exec-checked-script
+    (str "Deploy smeagol war file to tomcat")
+    ("cp" ~smeagol-war-file-location ~tomcat-webapps-location)))
 
 ;TODO
 (s/defn install-smeagol
   [config :- schema/SmeagolInfra]
   (let [{:keys [repo-download-source]} config
-        smeagol-repo (str smeagol-location smeagol-dir)]
+        smeagol-repo (str smeagol-location smeagol-dir)
+        war-filename "smeagol.war"
+        war-location (str smeagol-repo "target/" war-filename)]
     (smeagol-remote-directory-unzip smeagol-location repo-download-source)
-    (smeagol-create-war smeagol-repo "smeagol.war")
-    ))
+    (smeagol-create-war smeagol-repo war-filename)
+    (deploy-smeagol war-location tomcat-webapps)))
