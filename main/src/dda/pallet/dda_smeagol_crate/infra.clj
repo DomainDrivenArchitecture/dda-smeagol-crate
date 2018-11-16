@@ -35,8 +35,8 @@
   [core-infra config]
   (clj/install-system facility)
   (js/install-system facility)
-  (smeagol/install-smeagol config)
-  )
+  (smeagol/install-smeagol config))
+
 
 (s/defmethod core-infra/dda-configure facility
   [core-infra config])

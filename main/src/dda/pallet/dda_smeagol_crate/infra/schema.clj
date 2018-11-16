@@ -19,4 +19,7 @@
     [schema.core :as s]))
 
 (def SmeagolInfra
-  {:repo-download-source s/Str})
+  {:smeagol-location s/Str
+   :repo-download-source s/Str
+   :resource-locations [{:name s/Str :source s/Str :destination s/Str}]
+   :environment-variables [{:name s/Str :value s/Str}]})

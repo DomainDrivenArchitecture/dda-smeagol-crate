@@ -33,13 +33,13 @@
     :owner owner
     :group owner))
 
-(def smeagol-location "/var/lib/smeagol/")
 (def smeagol-dir "smeagol-master/")
 (def tomcat8-location "/var/lib/tomcat8/")
 (def tomcat-webapps (str tomcat8-location "webapps/"))
 
 (defn smeagol-create-war
   [repo-location filename]
+  (print repo-location)
   (actions/exec-checked-script
     (str "Create smeagol war file")
     ("cd" ~repo-location "&&" "lein bower install")
@@ -51,13 +51,43 @@
     (str "Deploy smeagol war file to tomcat")
     ("cp" ~smeagol-war-file-location ~tomcat-webapps-location)))
 
+(s/defn create-dir
+  "create directories
+   -p no error if existing, make parent directories as needed"
+  [config :- schema/SmeagolInfra]
+  (actions/exec-checked-script
+    (str "Create direcotires for configuration files")
+    (doseq [resource (:resource-locations config)]
+      ("mkdir" "-p" (:destination resource)))))
+
+(s/defn move-resources-to-directories
+  "Move the resources in the git repository to the newly created
+   directories"
+  [config :- schema/SmeagolInfra]
+  (actions/exec-checked-script
+    (str config)
+    (doseq [resource (:resource-locations config)]
+      ("cp" "-r" (:source resource) (:destination resource)))))
+
+;TODO needs info about user for .bashrc
+(s/defn create-environment-variables
+  [config :- schema/SmeagolInfra]
+  (actions/exec-checked-script
+    (str "Create environment variables")
+    (doseq [env (:environment-variables config)]
+      ("export" (str (:name env) "=" (:value env))))))
+
 ;TODO
 (s/defn install-smeagol
   [config :- schema/SmeagolInfra]
-  (let [{:keys [repo-download-source]} config
+  (let [{:keys [repo-download-source smeagol-location]} config
         smeagol-repo (str smeagol-location smeagol-dir)
         war-filename "smeagol.war"
         war-location (str smeagol-repo "target/" war-filename)]
+    (print config)
     (smeagol-remote-directory-unzip smeagol-location repo-download-source)
     (smeagol-create-war smeagol-repo war-filename)
-    (deploy-smeagol war-location tomcat-webapps)))
+    (deploy-smeagol war-location tomcat-webapps)
+    (create-dir config)
+    (move-resources-to-directories config)
+    (create-environment-variables config)))
