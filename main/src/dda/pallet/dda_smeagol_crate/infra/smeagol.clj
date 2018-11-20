@@ -33,10 +33,6 @@
     :owner owner
     :group owner))
 
-(def smeagol-dir "smeagol-master/")
-(def tomcat8-location "/var/lib/tomcat8/")
-(def tomcat-webapps (str tomcat8-location "webapps/"))
-
 (defn smeagol-create-war
   [repo-location filename]
   (print repo-location)
@@ -45,18 +41,12 @@
     ("cd" ~repo-location "&&" "lein bower install")
     ("cd" ~repo-location "&&" "lein ring uberwar" ~filename)))
 
-(defn deploy-smeagol
-  [smeagol-war-file-location tomcat-webapps-location]
-  (actions/exec-checked-script
-    (str "Deploy smeagol war file to tomcat")
-    ("cp" ~smeagol-war-file-location ~tomcat-webapps-location)))
-
-(s/defn create-dir
+(s/defn create-dirs
   "create directories
    -p no error if existing, make parent directories as needed"
   [config :- schema/SmeagolInfra]
   (actions/exec-checked-script
-    (str "Create direcotires for configuration files")
+    (str "Create directories for configuration files")
     (doseq [resource (:resource-locations config)]
       ("mkdir" "-p" (:destination resource)))))
 
@@ -64,10 +54,12 @@
   "Move the resources in the git repository to the newly created
    directories"
   [config :- schema/SmeagolInfra]
-  (actions/exec-checked-script
-    (str config)
-    (doseq [resource (:resource-locations config)]
-      ("cp" "-r" (:source resource) (:destination resource)))))
+  (doseq [resource (:resource-locations config)]
+    (let [source (:source resource)
+          destination (:destination resource)]
+    (actions/exec-checked-script
+      (str "Move the resources in the git repository to the newly created directories\n" config)
+      ("cp" "-r" ~source ~destination)))))
 
 ;TODO needs info about user for .bashrc
 (s/defn create-environment-variables
@@ -80,14 +72,13 @@
 ;TODO
 (s/defn install-smeagol
   [config :- schema/SmeagolInfra]
-  (let [{:keys [repo-download-source smeagol-location]} config
-        smeagol-repo (str smeagol-location smeagol-dir)
+  (let [{:keys [repo-download-source smeagol-parent-dir smeagol-dir]} config
+        smeagol-repo (str smeagol-parent-dir smeagol-dir)
         war-filename "smeagol.war"
         war-location (str smeagol-repo "target/" war-filename)]
     (print config)
-    (smeagol-remote-directory-unzip smeagol-location repo-download-source)
+    (smeagol-remote-directory-unzip smeagol-parent-dir repo-download-source)
     (smeagol-create-war smeagol-repo war-filename)
-    (deploy-smeagol war-location tomcat-webapps)
-    (create-dir config)
+    (create-dirs config)
     (move-resources-to-directories config)
     (create-environment-variables config)))

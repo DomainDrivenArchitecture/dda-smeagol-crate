@@ -18,8 +18,10 @@
   (:require
     [schema.core :as s]))
 
+; TODO: simplify smeagol-parent-dir and smeagol-dir to one directory
 (def SmeagolInfra
-  {:smeagol-location s/Str
+  {:smeagol-parent-dir s/Str
+   :smeagol-dir s/Str
    :repo-download-source s/Str
    :resource-locations [{:name s/Str :source s/Str :destination s/Str}]
    :environment-variables [{:name s/Str :value s/Str}]})
