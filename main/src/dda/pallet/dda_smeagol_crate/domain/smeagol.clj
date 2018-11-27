@@ -46,7 +46,7 @@
 (s/defn smeagol-infra-configuration
   [domain-config :- schema/SmeagolDomain
    facility :- s/Keyword]
-  (let [smeagol-parent-dir "/var/lib/"
+  (let [smeagol-parent-dir "/var/lib/smeagol/"
         smeagol-dir "smeagol-master/"]
     {facility
      {:smeagol-parent-dir smeagol-parent-dir
