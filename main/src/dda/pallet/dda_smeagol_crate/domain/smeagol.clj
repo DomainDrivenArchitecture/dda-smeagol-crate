@@ -51,6 +51,7 @@
     {facility
      {:smeagol-parent-dir smeagol-parent-dir
       :smeagol-dir smeagol-dir
+      :smeagol-passwd (:smeagol-passwd domain-config)
       :repo-download-source "https://github.com/DomainDrivenArchitecture/smeagol/archive/master.zip"
       :resource-locations (resource-location-helper (str smeagol-parent-dir smeagol-dir))
       :environment-variables environment-variables}}))

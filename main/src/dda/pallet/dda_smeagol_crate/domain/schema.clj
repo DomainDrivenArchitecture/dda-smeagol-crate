@@ -16,6 +16,9 @@
 
 (ns dda.pallet.dda-smeagol-crate.domain.schema
   (:require
-    [schema.core :as s]))
+   [schema.core :as s]
+   [dda.pallet.dda-smeagol-crate.schema :as crate-schema]))
 
-(def SmeagolDomain {(s/optional-key :tomcat-xmx-megabyte) s/Num})
+(def SmeagolDomain
+  {(s/optional-key :tomcat-xmx-megabyte) s/Num
+   (s/optional-key :smeagol-passwd) crate-schema/SmeagolPasswd})
