@@ -69,6 +69,18 @@
     (doseq [env (:environment-variables config)]
       ("export" (str (:name env) "=" (:value env))))))
 
+(s/defn create-smeagol-passwd
+  [config :- schema/SmeagolInfra]
+  (let [{:keys [resource-locations smeagol-passwd]} config
+        {:keys [destination]} (first (filter #(-> % :name (= "passwd")) resource-locations))]
+    (if destination
+      (actions/remote-file
+       destination
+       :owner "root"
+       :group "users"
+       :mode "755"
+       :content (pr-str smeagol-passwd)))))
+
 ;TODO
 (s/defn install-smeagol
   [config :- schema/SmeagolInfra]
@@ -80,5 +92,6 @@
     (smeagol-remote-directory-unzip smeagol-parent-dir repo-download-source)
     (smeagol-create-war smeagol-repo war-filename)
     (create-dirs config)
+    (create-smeagol-passwd config)
     (move-resources-to-directories config)
     (create-environment-variables config)))

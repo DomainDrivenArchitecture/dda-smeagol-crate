@@ -16,12 +16,14 @@
 
 (ns dda.pallet.dda-smeagol-crate.infra.schema
   (:require
-    [schema.core :as s]))
+   [schema.core :as s]
+   [dda.pallet.dda-smeagol-crate.schema :as crate-schema]))
 
 ; TODO: simplify smeagol-parent-dir and smeagol-dir to one directory
 (def SmeagolInfra
   {:smeagol-parent-dir s/Str
    :smeagol-dir s/Str
+   :smeagol-passwd crate-schema/SmeagolPasswd
    :repo-download-source s/Str
    :resource-locations [{:name s/Str :source s/Str :destination s/Str}]
    :environment-variables [{:name s/Str :value s/Str}]})
