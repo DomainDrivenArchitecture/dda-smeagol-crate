@@ -38,14 +38,14 @@
 (s/defn
   init-nodejs
   [facility :- s/Keyword]
-    (actions/as-action
-      (logging/info (str facility "-init system: init-nodejs")))
-    (actions/package-source (str "nodejs_8.x")
-      :aptitude
-      {:url (str "https://deb.nodesource.com/node_8.x")
-       :release "bionic"
-       :scopes ["main"]
-       :key-url "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"}))
+  (actions/as-action
+    (logging/info (str facility "-init system: init-nodejs")))
+  (actions/package-source (str "nodejs_8.x")
+    :aptitude
+    {:url (str "https://deb.nodesource.com/node_8.x")
+     :release "bionic"
+     :scopes ["main"]
+     :key-url "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"}))
 
 (s/defn
   install-nodejs
@@ -60,6 +60,9 @@
   (init-nodejs facility))
 
 ;TODO: Fix npm dependency problem
+; comment jem / 2018.11.30: at https://github.com/DomainDrivenArchitecture/dda-managed-ide/blob/master/main/src/dda/pallet/dda_managed_ide/infra/java_script.clj
+; we've a consistant node & npm installation ... if the maintained version of node is good enough. Mixed installations will cause many depenency issues and npm itself often needs
+; strange workarounds on linux systems ...
 (s/defn install-system
   [facility :- s/Keyword]
   (install-nodejs facility)
