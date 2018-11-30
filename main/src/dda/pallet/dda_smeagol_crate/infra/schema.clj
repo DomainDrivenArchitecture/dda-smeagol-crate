@@ -24,6 +24,7 @@
   {:smeagol-parent-dir s/Str
    :smeagol-dir s/Str
    :smeagol-passwd crate-schema/SmeagolPasswd
+   :smeagol-owner s/Str
    :repo-download-source s/Str
-   :resource-locations [{:name s/Str :source s/Str :destination s/Str}]
+   :resource-locations {s/Keyword {:name s/Str :source s/Str :destination s/Str}}
    :environment-variables [{:name s/Str :value s/Str}]})

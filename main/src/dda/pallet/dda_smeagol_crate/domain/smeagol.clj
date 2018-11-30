@@ -21,10 +21,10 @@
 
 (defn- resource-location-helper
   [smeagol-location]
-  [{:name "war-location" :source (str smeagol-location "target/smeagol.war") :destination "/var/lib/tomcat8/webapps/smeagol.war"}
-   {:name "passwd" :source (str smeagol-location "resources/passwd") :destination "/usr/local/etc/passwd"}
-   {:name "config-edn" :source (str smeagol-location "resources/config.edn") :destination "/usr/local/etc/config.edn"}
-   {:name "config-edn" :source (str smeagol-location "resources/public/content") :destination "/usr/local/etc/content"}])
+  {:war-location {:name "war-location" :source (str smeagol-location "target/smeagol.war") :destination "/var/lib/tomcat8/webapps/smeagol.war"}
+   :passwd {:name "passwd" :source (str smeagol-location "resources/passwd") :destination "/usr/local/etc/passwd"}
+   :config-edn {:name "config-edn" :source (str smeagol-location "resources/config.edn") :destination "/usr/local/etc/config.edn"}
+   :content-dir {:name "content-dir" :source (str smeagol-location "resources/public/content") :destination "/usr/local/etc/content"}})
 
 
 (def environment-variables
@@ -46,12 +46,14 @@
 (s/defn smeagol-infra-configuration
   [domain-config :- schema/SmeagolDomain
    facility :- s/Keyword]
-  (let [smeagol-parent-dir "/var/lib/smeagol/"
-        smeagol-dir "smeagol-master/"]
+  (let [smeagol-parent-dir "/var/lib/"
+        smeagol-dir "smeagol-master/"
+        smeagol-owner "tomcat8"]
     {facility
      {:smeagol-parent-dir smeagol-parent-dir
       :smeagol-dir smeagol-dir
       :smeagol-passwd (:smeagol-passwd domain-config)
+      :smeagol-owner smeagol-owner
       :repo-download-source "https://github.com/DomainDrivenArchitecture/smeagol/archive/master.zip"
       :resource-locations (resource-location-helper (str smeagol-parent-dir smeagol-dir))
       :environment-variables environment-variables}}))

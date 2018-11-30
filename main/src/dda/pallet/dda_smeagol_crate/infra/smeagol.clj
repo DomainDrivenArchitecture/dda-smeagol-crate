@@ -28,14 +28,33 @@
   (actions/remote-directory
     target-dir
     :url download-url
-    :unpack :unzip
-    :recursive true
-    :owner owner
-    :group owner))
+    :unpack :unzip))
+
+;; lets embed config directly into war by replacing `resources/config.edn`
+(s/defn create-smeagol-config
+  [config :- schema/SmeagolInfra]
+  (let [{:keys [resource-locations smeagol-owner]} config
+        {:keys [config-edn passwd content-dir]} resource-locations
+        {:keys [source]} config-edn
+        ;; consider read config contents and rewrite back
+        smeagol-config {:content-dir (:destination content-dir)
+                        :passwd (:destination passwd)
+                        :site-title "Smeagol"
+                        :default-locale "en-GB"
+                        :formatters {"vega" 'smeagol.formatting/process-vega
+                                     "vis" 'smeagol.formatting/process-vega
+                                     "mermaid" 'smeagol.formatting/process-mermaid
+                                     "backticks" 'smeagol.formatting/process-backticks}
+                        :log-level :info}]
+    (if source
+      (actions/remote-file
+       source
+       :owner smeagol-owner
+       :mode "755"
+       :content (pr-str smeagol-config)))))
 
 (defn smeagol-create-war
   [repo-location filename]
-  (print repo-location)
   (actions/exec-checked-script
     (str "Create smeagol war file")
     ("cd" ~repo-location "&&" "lein bower install")
@@ -45,53 +64,31 @@
   "create directories
    -p no error if existing, make parent directories as needed"
   [config :- schema/SmeagolInfra]
-  (actions/exec-checked-script
-    (str "Create directories for configuration files")
-    (doseq [resource (:resource-locations config)]
-      ("mkdir" "-p" (:destination resource)))))
+  (let [directories (map :destination (:resource-locations config))
+        owner (:smeagol-owner config)]
+    (actions/directories directories :owner owner)))
 
 (s/defn move-resources-to-directories
   "Move the resources in the git repository to the newly created
    directories"
   [config :- schema/SmeagolInfra]
-  (doseq [resource (:resource-locations config)]
-    (let [source (:source resource)
-          destination (:destination resource)]
-    (actions/exec-checked-script
-      (str "Move the resources in the git repository to the newly created directories\n" config)
-      ("cp" "-r" ~source ~destination)))))
+  (let [{:keys [smeagol-owner]} config]
+    (doseq [[_ resource] (:resource-locations config)]
+      (let [{:keys [source destination]} resource]
+        (actions/exec-checked-script
+           (str "Move the resources in the git repository to the newly created directories\n" config)
+           ("cp" "-r" ~source ~destination)
+           ("chown" "-R" ~smeagol-owner ~destination)
+           ("chgrp" "-R" ~smeagol-owner ~destination))))))
 
-;TODO needs info about user for .bashrc
-(s/defn create-environment-variables
-  [config :- schema/SmeagolInfra]
-  (actions/exec-checked-script
-    (str "Create environment variables")
-    (doseq [env (:environment-variables config)]
-      ("export" (str (:name env) "=" (:value env))))))
-
-(s/defn create-smeagol-passwd
-  [config :- schema/SmeagolInfra]
-  (let [{:keys [resource-locations smeagol-passwd]} config
-        {:keys [destination]} (first (filter #(-> % :name (= "passwd")) resource-locations))]
-    (if destination
-      (actions/remote-file
-       destination
-       :owner "root"
-       :group "users"
-       :mode "755"
-       :content (pr-str smeagol-passwd)))))
-
-;TODO
 (s/defn install-smeagol
   [config :- schema/SmeagolInfra]
   (let [{:keys [repo-download-source smeagol-parent-dir smeagol-dir]} config
         smeagol-repo (str smeagol-parent-dir smeagol-dir)
         war-filename "smeagol.war"
         war-location (str smeagol-repo "target/" war-filename)]
-    (print config)
     (smeagol-remote-directory-unzip smeagol-parent-dir repo-download-source)
+    (create-smeagol-config config)
     (smeagol-create-war smeagol-repo war-filename)
     (create-dirs config)
-    (create-smeagol-passwd config)
-    (move-resources-to-directories config)
-    (create-environment-variables config)))
+    (move-resources-to-directories config)))
