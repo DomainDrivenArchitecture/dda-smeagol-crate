@@ -1,0 +1,11 @@
+{
+  :site-title           "DomainDrivenArchitecture"
+  :default-locale       "en-GB"
+  :content-dir          "/var/git/smeagol"
+  :passwd               "/etc/smeagol/passwd.edn"
+  :log-level            :info
+  :formatters           {"vega"         smeagol.formatting/process-vega
+                         "vis"          smeagol.formatting/process-vega
+                         "mermaid"      smeagol.formatting/process-mermaid
+                         "backticks"    smeagol.formatting/process-backticks}
+}
