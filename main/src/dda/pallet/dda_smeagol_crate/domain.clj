@@ -29,9 +29,14 @@
 (s/defn ^:always-validate
   tomcat-domain-configuration
   [domain-config :- SmeagolDomain]
-  (smeagol/tomcat-domain-configuration domain-config))
+  (let [{:keys [tomcat-xmx-megabyte smeagol-passwd]
+         :or {tomcat-xmx-megabyte 2560} domain-config}]
+    (smeagol/tomcat-domain-configuration tomcat-xmx-megabyte)))
 
 (s/defn ^:always-validate
   infra-configuration
   [domain-config :- SmeagolDomain]
-  (smeagol/smeagol-infra-configuration domain-config infra/facility))
+  (let [{:keys [tomcat-xmx-megabyte smeagol-passwd]
+         :or {tomcat-xmx-megabyte 2560} domain-config}])
+  (smeagol/smeagol-infra-configuration infra/facility
+    smeagol-passwd))

@@ -35,24 +35,22 @@
    {:name "TIMBRE_LEVEL" :value ":info"}
    {:name "PORT" :value "80"}])
 
-
+;; Review jem 2018_12_03: why not move tomcat into own ns ? - or remove it ;-)
 (s/defn tomcat-domain-configuration
-  [domain-config :- schema/SmeagolDomain]
-  (let [{:keys [tomcat-xmx-megabyte] :or {tomcat-xmx-megabyte 2560}} domain-config]
-    {:app-server
-     {:xmx-megabyte tomcat-xmx-megabyte}}))            ; e.g. 6072 or 2560
-
+  [tomcat-xmx-megabyte]
+  {:app-server
+   {:xmx-megabyte tomcat-xmx-megabyte}})            ; e.g. 6072 or 2560
 
 (s/defn smeagol-infra-configuration
-  [domain-config :- schema/SmeagolDomain
-   facility :- s/Keyword]
+  [facility :- s/Keyword
+   smeagol-passwd :- schema/SmeagolPasswd]
   (let [smeagol-parent-dir "/var/lib/"
         smeagol-dir "smeagol-master/"
         smeagol-owner "tomcat8"]
     {facility
      {:smeagol-parent-dir smeagol-parent-dir
       :smeagol-dir smeagol-dir
-      :smeagol-passwd (:smeagol-passwd domain-config)
+      :smeagol-passwd smeagol-passwd
       :smeagol-owner smeagol-owner
       :repo-download-source "https://github.com/DomainDrivenArchitecture/smeagol/archive/master.zip"
       :resource-locations (resource-location-helper (str smeagol-parent-dir smeagol-dir))
