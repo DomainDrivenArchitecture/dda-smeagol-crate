@@ -28,14 +28,17 @@
   [domain :- s/Str
    git-credential :- GitCredentialResolved
    git-content-repo :- Repository]
-  {:smeagol-user
+  {:smeagol
    {:user-email (str "smeagol@" domain)
     :credential [git-credential]
     :repo {}
-    :synced-repo {:folder1 [git-content-repo]}}})
+    :synced-repo {:smeagol [git-content-repo]}}})
 
 (s/defn
   infra-configuration
-  [facility :- s/Keyword
-   git-credential :- GitCredential
-   git-content-repo :- Repository])
+  [domain :- s/Str
+   git-credential :- GitCredentialResolved
+   git-content-repo :- Repository]
+  (git-domain/infra-configuration
+    (domain-configuration
+      domain git-credential git-content-repo)))
