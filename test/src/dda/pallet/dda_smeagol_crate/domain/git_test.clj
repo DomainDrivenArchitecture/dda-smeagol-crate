@@ -17,13 +17,13 @@
   (:require
    [clojure.test :refer :all]
    [schema.core :as s]
-   [dda.pallet.dda-smeagol-crate.domain.smeagol :as sut]))
+   [dda.pallet.dda-smeagol-crate.domain.git :as sut]))
 
-(def git-multiuser
+(def git-example
   {:input {:git-credential {:host "github.com"
                             :protocol :ssh
                             :user-name "githubtest"}
-           :content-git-repo {:host "rgithub.com"
+           :git-content-repo {:host "rgithub.com"
                               :repo-name "a-private-repo"
                               :protocol :ssh
                               :server-type :github}}
@@ -37,3 +37,10 @@
               :repo []
               :trust [{:pin-fqdn-or-ip {:port 443
                                         :host "github.com",}}]}}}})
+
+(deftest test-domain-creation
+  (testing
+    (is (= (:output git-example)
+           (sut/domain-configuration
+             (get-in git-example [:input :git-credential])
+             (get-in git-example [:input :git-content-repo]))))))

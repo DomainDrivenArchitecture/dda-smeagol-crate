@@ -22,3 +22,24 @@
 (def Repository git-domain/Repository)
 (def GitCredential git-domain/GitCredential)
 (def GitCredentialResolved git-domain/GitCredentialResolved)
+
+(s/defn
+  domain-configuration :- git-domain/GitDomain
+  [git-credential :- GitCredential
+   git-content-repo :- Repository]
+  {:dda-git
+           {:smeagol-user
+            {:config {:email "test-user1@domain"},
+             :synced-repo {:folder1 [{:host "repositories.website.com"
+                                      :repo-name "a-private-repo"
+                                      :protocol :ssh
+                                      :server-type :github}]}
+             :repo []
+             :trust [{:pin-fqdn-or-ip {:port 443
+                                       :host "github.com",}}]}}})
+
+(s/defn
+  infra-configuration
+  [facility :- s/Keyword
+   git-credential :- GitCredential
+   git-content-repo :- Repository])

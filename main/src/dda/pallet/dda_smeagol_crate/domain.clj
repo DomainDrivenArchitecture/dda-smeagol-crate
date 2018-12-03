@@ -26,7 +26,7 @@
                                                           ;; not optional - passwords should be allways defined  ...
                                                           ;; smeagol-users is maybe a better name?
    :git-credential git/GitCredential
-   :content-git-repo git/Repository})
+   :git-content-repo git/Repository})
 
 (def InfraResult {infra/facility infra/SmeagolInfra})
 
@@ -36,6 +36,12 @@
   (let [{:keys [tomcat-xmx-megabyte smeagol-passwd]
          :or {tomcat-xmx-megabyte 2560}} domain-config]
     (smeagol/tomcat-domain-configuration tomcat-xmx-megabyte)))
+
+(s/defn ^:always-validate
+  git-infra-configuration
+  [domain-config :- SmeagolDomain]
+  (let [{:keys [git-credential git-content-repo]} domain-config]
+    (git/infra-configuration infra/facility git-credential git-content-repo)))
 
 (s/defn ^:always-validate
   infra-configuration
