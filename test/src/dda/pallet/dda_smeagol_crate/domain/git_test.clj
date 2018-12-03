@@ -25,14 +25,14 @@
   {:input {:git-credential {:host "github.com"
                             :protocol :ssh
                             :user-name "githubtest"}
-           :git-content-repo {:host "rgithub.com"
+           :git-content-repo {:host "github.com"
                               :repo-name "a-private-repo"
                               :protocol :ssh
                               :server-type :github}}
    :output {:smeagol-user
-             {:user-email "test-user1@domain"
+             {:user-email "smeagol@domain"
               :repo {}
-              :synced-repo {:folder1 [{:host "repositories.website.com"
+              :synced-repo {:folder1 [{:host "github.com"
                                        :repo-name "a-private-repo"
                                        :protocol :ssh
                                        :server-type :github}]}}}})
@@ -41,5 +41,6 @@
   (testing
     (is (= (:output git-domain)
            (sut/domain-configuration
+             "domain"
              (get-in git-domain [:input :git-credential])
              (get-in git-domain [:input :git-content-repo]))))))

@@ -25,15 +25,13 @@
 
 (s/defn
   domain-configuration :- git-domain/GitDomain
-  [git-credential :- GitCredentialResolved
+  [domain :- s/Str
+   git-credential :- GitCredentialResolved
    git-content-repo :- Repository]
   {:smeagol-user
-   {:user-email "test-user1@domain"
+   {:user-email (str "smeagol@" domain)
     :repo {}
-    :synced-repo {:folder1 [{:host "repositories.website.com"
-                             :repo-name "a-private-repo"
-                             :protocol :ssh
-                             :server-type :github}]}}})
+    :synced-repo {:folder1 [git-content-repo]}}})
 
 (s/defn
   infra-configuration
