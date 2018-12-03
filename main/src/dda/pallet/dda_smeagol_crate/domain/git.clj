@@ -24,12 +24,13 @@
 (def GitCredentialResolved git-domain/GitCredentialResolved)
 
 (s/defn
-  domain-configuration :- git-domain/GitDomain
+  domain-configuration :- git-domain/GitDomainResolved
   [domain :- s/Str
    git-credential :- GitCredentialResolved
    git-content-repo :- Repository]
   {:smeagol-user
    {:user-email (str "smeagol@" domain)
+    :credential [git-credential]
     :repo {}
     :synced-repo {:folder1 [git-content-repo]}}})
 

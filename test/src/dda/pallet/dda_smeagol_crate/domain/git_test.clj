@@ -23,18 +23,21 @@
 
 (def git-domain
   {:input {:git-credential {:host "github.com"
-                            :protocol :ssh
-                            :user-name "githubtest"}
+                            :protocol :https
+                            :user-name "smeagol"}
            :git-content-repo {:host "github.com"
                               :repo-name "a-private-repo"
-                              :protocol :ssh
+                              :protocol :https
                               :server-type :github}}
    :output {:smeagol-user
              {:user-email "smeagol@domain"
+              :credential [{:host "github.com"
+                            :protocol :https
+                            :user-name "smeagol"}]
               :repo {}
               :synced-repo {:folder1 [{:host "github.com"
                                        :repo-name "a-private-repo"
-                                       :protocol :ssh
+                                       :protocol :https
                                        :server-type :github}]}}}})
 
 (deftest test-domain-creation
