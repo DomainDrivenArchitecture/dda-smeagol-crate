@@ -5,6 +5,7 @@
             :url "https://www.apache.org/licenses/LICENSE-2.0.html"}
   :dependencies [[dda/dda-pallet "2.2.2"]
                  [prismatic/schema "1.1.9"]
+                 [dda/dda-git-crate "2.1.3"]
                  [dda/dda-tomcat-crate "2.0.2-SNAPSHOT"]]
   :source-paths ["main/src"]
   :resource-paths ["main/resources"]

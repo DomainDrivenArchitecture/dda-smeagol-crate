@@ -20,9 +20,9 @@
    [dda.pallet.dda-smeagol-crate.domain.smeagol :as sut]))
 
 (def git-multiuser
-  {:input {:git-credential [{:host "github.com"
-                             :protocol :ssh
-                             :user-name "githubtest"}]
+  {:input {:git-credential {:host "github.com"
+                            :protocol :ssh
+                            :user-name "githubtest"}
            :content-git-repo {:host "rgithub.com"
                               :repo-name "a-private-repo"
                               :protocol :ssh

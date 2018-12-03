@@ -16,13 +16,17 @@
 (ns dda.pallet.dda-smeagol-crate.domain
   (:require
     [schema.core :as s]
-    [dda.pallet.dda-smeagol-crate.domain.schema :as schema]
     [dda.pallet.dda-smeagol-crate.domain.smeagol :as smeagol]
+    [dda.pallet.dda-smeagol-crate.domain.git :as git]
     [dda.pallet.dda-smeagol-crate.infra :as infra]))
 
 (def SmeagolDomain
   {(s/optional-key :tomcat-xmx-megabyte) s/Num ;; necessary on level of domain?
-   (s/optional-key :smeagol-passwd) smeagol/SmeagolPasswd}) ;; reference from top level package is forbidden! moved to top-level
+   (s/optional-key :smeagol-passwd) smeagol/SmeagolPasswd ;; reference from top level package is forbidden! moved to top-level
+                                                          ;; not optional - passwords should be allways defined  ...
+                                                          ;; smeagol-users is maybe a better name?
+   :git-credential git/GitCredential
+   :content-git-repo git/Repository})
 
 (def InfraResult {infra/facility infra/SmeagolInfra})
 
