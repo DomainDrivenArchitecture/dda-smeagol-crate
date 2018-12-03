@@ -25,18 +25,15 @@
 
 (s/defn
   domain-configuration :- git-domain/GitDomain
-  [git-credential :- GitCredential
+  [git-credential :- GitCredentialResolved
    git-content-repo :- Repository]
-  {:dda-git
-           {:smeagol-user
-            {:config {:email "test-user1@domain"},
-             :synced-repo {:folder1 [{:host "repositories.website.com"
-                                      :repo-name "a-private-repo"
-                                      :protocol :ssh
-                                      :server-type :github}]}
-             :repo []
-             :trust [{:pin-fqdn-or-ip {:port 443
-                                       :host "github.com",}}]}}})
+  {:smeagol-user
+   {:user-email "test-user1@domain"
+    :repo {}
+    :synced-repo {:folder1 [{:host "repositories.website.com"
+                             :repo-name "a-private-repo"
+                             :protocol :ssh
+                             :server-type :github}]}}})
 
 (s/defn
   infra-configuration

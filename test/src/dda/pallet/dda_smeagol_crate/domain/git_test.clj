@@ -19,7 +19,9 @@
    [schema.core :as s]
    [dda.pallet.dda-smeagol-crate.domain.git :as sut]))
 
-(def git-example
+(s/set-fn-validation! true)
+
+(def git-domain
   {:input {:git-credential {:host "github.com"
                             :protocol :ssh
                             :user-name "githubtest"}
@@ -27,20 +29,17 @@
                               :repo-name "a-private-repo"
                               :protocol :ssh
                               :server-type :github}}
-   :output {:dda-git
-            {:smeagol-user
-             {:config {:email "test-user1@domain"},
+   :output {:smeagol-user
+             {:user-email "test-user1@domain"
+              :repo {}
               :synced-repo {:folder1 [{:host "repositories.website.com"
                                        :repo-name "a-private-repo"
                                        :protocol :ssh
-                                       :server-type :github}]}
-              :repo []
-              :trust [{:pin-fqdn-or-ip {:port 443
-                                        :host "github.com",}}]}}}})
+                                       :server-type :github}]}}}})
 
 (deftest test-domain-creation
   (testing
-    (is (= (:output git-example)
+    (is (= (:output git-domain)
            (sut/domain-configuration
-             (get-in git-example [:input :git-credential])
-             (get-in git-example [:input :git-content-repo]))))))
+             (get-in git-domain [:input :git-credential])
+             (get-in git-domain [:input :git-content-repo]))))))
