@@ -19,6 +19,7 @@
     [schema.core :as s]
     [dda.pallet.dda-smeagol-crate.domain.schema :as schema]))
 
+
 (defn- resource-location-helper
   [smeagol-location]
   {:war-location {:name "war-location" :source (str smeagol-location "target/smeagol.war") :destination "/var/lib/tomcat8/webapps/smeagol.war"}
@@ -26,6 +27,7 @@
    :config-edn {:name "config-edn" :source (str smeagol-location "resources/config.edn") :destination "/usr/local/etc/config.edn"}
    :content-dir {:name "content-dir" :source (str smeagol-location "resources/public/content") :destination "/usr/local/etc/content"}})
 
+(def SmeagolPasswd schema/SmeagolPasswd)
 
 (def environment-variables
   [{:name "SMEAGOL_CONFIG" :value "/usr/local/etc/config.edn"}

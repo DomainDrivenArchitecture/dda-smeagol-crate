@@ -13,8 +13,16 @@
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-(ns dda.pallet.dda-smeagol-crate.domain-test
+(ns dda.pallet.dda-smeagol-crate.domain.smeagol-test
   (:require
    [clojure.test :refer :all]
    [schema.core :as s]
-   [dda.pallet.dda-smeagol-crate.domain :as sut]))
+   [dda.pallet.dda-smeagol-crate.domain.smeagol :as sut]))
+
+(def passwd
+  {:admin {:admin true, :email "admin@localhost", :password "admin"}})
+
+(deftest test-schema
+  (testing "test the smeagol schema"
+    (is (s/validate sut/SmeagolPasswd passwd))
+    (is (thrown? Exception (s/validate sut/SmeagolPasswd {:unsuported-key :unsupported-value})))))
