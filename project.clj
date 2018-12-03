@@ -3,7 +3,7 @@
   :url "https://domaindrivenarchitecture.org"
   :license {:name "Apache License, Version 2.0"
             :url "https://www.apache.org/licenses/LICENSE-2.0.html"}
-  :dependencies [[dda/dda-pallet "2.2.1"]
+  :dependencies [[dda/dda-pallet "2.2.2"]
                  [prismatic/schema "1.1.9"]
                  [dda/dda-tomcat-crate "2.0.2-SNAPSHOT"]]
   :source-paths ["main/src"]
@@ -37,7 +37,7 @@
                        :resource-paths ["uberjar/resources"]
                        :aot :all
                        :main dda.pallet.dda-smeagol-crate.main
-                       :dependencies [[org.clojure/tools.cli "0.3.7"]
+                       :dependencies [[org.clojure/tools.cli "0.4.1"]
                                       [ch.qos.logback/logback-classic "1.3.0-alpha4"]
                                       [org.slf4j/jcl-over-slf4j "1.8.0-beta2"]]}}
   :release-tasks [["vcs" "assert-committed"]
