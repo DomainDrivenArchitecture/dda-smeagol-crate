@@ -13,18 +13,16 @@
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-
-(ns dda.pallet.dda-smeagol-crate.domain.schema
+(ns dda.pallet.dda-smeagol-crate.domain-test
   (:require
-   [schema.core :as s]))
+   [clojure.test :refer :all]
+   [schema.core :as s]
+   [dda.pallet.dda-smeagol-crate.domain :as sut]))
 
-; TODO: Review jem 2018_12_03: Move schema do smeagol ns - like DomainDrivenDesign
-; Aggregate keep it local
+(def passwd
+  {:admin {:admin true, :email "admin@localhost", :password "admin"}})
 
-(def SmeagolPasswdUser
-  {:admin s/Bool
-   :email s/Str
-   :password s/Str}) ;; Why not keep passwords secret?!
-
-(def SmeagolPasswd
-  {s/Keyword SmeagolPasswdUser})
+(deftest test-schema
+  (testing "test the smeagol schema"
+    (is (s/validate sut/SmeagolPasswd passwd))
+    (is (thrown? Exception (s/validate sut/SmeagolPasswd {:unsuported-key :unsupported-value})))))

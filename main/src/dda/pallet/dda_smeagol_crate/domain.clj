@@ -13,7 +13,6 @@
 ; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
-
 (ns dda.pallet.dda-smeagol-crate.domain
   (:require
     [schema.core :as s]
@@ -21,7 +20,9 @@
     [dda.pallet.dda-smeagol-crate.domain.smeagol :as smeagol]
     [dda.pallet.dda-smeagol-crate.infra :as infra]))
 
-(def SmeagolDomain schema/SmeagolDomain)
+(def SmeagolDomain
+  {(s/optional-key :tomcat-xmx-megabyte) s/Num ;; necessary on level of domain?
+   (s/optional-key :smeagol-passwd) smeagol/SmeagolPasswd}) ;; reference from top level package is forbidden! moved to top-level
 
 (def InfraResult {infra/facility infra/SmeagolInfra})
 
