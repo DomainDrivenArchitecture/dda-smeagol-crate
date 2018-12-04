@@ -16,6 +16,7 @@
 (ns dda.pallet.dda-smeagol-crate.domain
   (:require
     [schema.core :as s]
+    [dda.pallet.commons.secret :as secret]
     [dda.pallet.dda-smeagol-crate.domain.smeagol :as smeagol]
     [dda.pallet.dda-smeagol-crate.domain.git :as git]
     [dda.pallet.dda-smeagol-crate.infra :as infra]))
@@ -27,6 +28,8 @@
                                                           ;; smeagol-users is maybe a better name?
    :git-credential git/GitCredential
    :git-content-repo git/Repository})
+
+(def SmeagolDomainResolved (secret/create-resolved-schema SmeagolDomain))
 
 (def InfraResult {infra/facility infra/SmeagolInfra})
 
@@ -47,5 +50,7 @@
   infra-configuration
   [domain-config :- SmeagolDomain]
   (let [{:keys [smeagol-passwd]} domain-config]
-    (smeagol/smeagol-infra-configuration infra/facility
-      smeagol-passwd)))
+    (merge
+      (git-infra-configuration domain-config)
+      (smeagol/smeagol-infra-configuration infra/facility
+        smeagol-passwd))))

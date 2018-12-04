@@ -17,9 +17,11 @@
 (ns dda.pallet.dda-smeagol-crate.app
   (:require
     [schema.core :as s]
-    [dda.pallet.core.app :as core-app]
+    [dda.pallet.commons.secret :as secret]
     [dda.config.commons.map-utils :as mu]
+    [dda.pallet.core.app :as core-app]
     [dda.pallet.dda-tomcat-crate.app :as tomcat]
+    [dda.pallet.dda-git-crate.app :as git]
     [dda.pallet.dda-config-crate.infra :as config-crate]
     [dda.pallet.dda-smeagol-crate.infra :as infra]
     [dda.pallet.dda-smeagol-crate.domain :as domain]))
@@ -30,22 +32,31 @@
 
 (def SmeagolDomain domain/SmeagolDomain)
 
+(def SmeagolDomainResolved domain/SmeagolDomainResolved)
+
 (def SmeagolAppConfig
-  {:group-specific-config 
+  {:group-specific-config
    {s/Keyword (merge tomcat/InfraResult
                      InfraResult)}})
 
 (s/defn ^:always-validate
-  app-configuration :- SmeagolAppConfig
-  [domain-config :- SmeagolDomain
+  app-configuration-resolved :- SmeagolAppConfig
+  [domain-config :- SmeagolDomainResolved
    & options]
   (let [{:keys [group-key] :or {group-key infra/facility}} options]
     (mu/deep-merge
       (tomcat/app-configuration
          (domain/tomcat-domain-configuration domain-config) :group-key group-key)
-      {:group-specific-config 
-       {group-key 
+      {:group-specific-config
+       {group-key
         (domain/infra-configuration domain-config)}})))
+
+(s/defn ^:always-validate
+  app-configuration :- SmeagolAppConfig
+  [domain-config :- SmeagolDomain
+   & options]
+  (let [resolved-domain-config (secret/resolve-secrets domain-config SmeagolDomain)]
+    (apply app-configuration-resolved resolved-domain-config options)))
 
 (s/defmethod ^:always-validate
   core-app/group-spec infra/facility
@@ -54,6 +65,7 @@
   (let [app-config (app-configuration domain-config)]
     (core-app/pallet-group-spec
       app-config [(config-crate/with-config app-config)
+                  git/with-git
                   tomcat/with-tomcat
                   with-smeagol])))
 
