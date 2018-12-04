@@ -20,7 +20,7 @@ matrix:
         - lein test
         - lein uberjar
         - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-        - docker build -t dda-smeagol-crate --file integration/docker/Dockerfile .
+        - docker build -t dda-smeagol-crate --file integration/docker/image/Dockerfile .
         - docker images
         - docker tag dda-smeagol-crate domaindrivenarchitecture/dda-smeagol-crate:SNAPSHOT
         - docker push $DOCKER_USERNAME/dda-smeagol-crate
@@ -31,8 +31,4 @@ matrix:
       install:
         - pip install docker
       script:
-        - docker pull domaindrivenarchitecture/dda-smeagol-crate
-        - docker images
-        - python3 --version
-        - curl -L -o serverspec.jar https://github.com/DomainDrivenArchitecture/dda-serverspec-crate/releases/download/1.2.1/dda-serverspec-crate-1.2.1-standalone.jar
-        - python3 integration/python/instantiate_docker.py serverspec.jar integration/resources/smeagol-serverspec.edn -i domaindrivenarchitecture/dda-smeagol-crate
+        - docker build -t dda-smeagol-crate-test --file integration/docker/test/Dockerfile .
