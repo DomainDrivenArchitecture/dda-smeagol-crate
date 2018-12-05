@@ -1,5 +1,5 @@
-sudo: required
 dist: trusty
+language: clojure
 
 services:
   - docker
@@ -12,10 +12,10 @@ env:
   global:
     - DOCKER_USERNAME: domaindrivenarchitecture
     - secure: "I0Ncp7Mv2mAEStsaQo+GqPmPRyFsddm2PQFsxGhIYuHOEm0mN4cAhLvtZCGRMVAEdaN2KJJ0w4x9dNEVUrCaWX66vHqVqWkSVVfjbLVzW4Yf27gpiZAXwj+4UbsBZ5on3GG40Isf6jOBYKTqfjJgm9TpmxGLfaWWHhadsAGGgAe6BX77O4ztZfeMtTYPTY+aLNyNvTF63UJ8KnunO/gByaVNZk/v8rSI13Ea3wLtw5zwDLjJiUz+zQmUpOuMEWaLFd3lMb6uJ5gxZav4HlmVIxydzdpER0+4GAT2EMoYhWxR1TeNKbPHsh6dkuE8oHyW6lCwAkrMkt4MjRYyHbPA9eDvZMxgXnUmChBk3QmRPXJmY/ilqjvXkezF5hM+acAYvHCC5uvTO3qApl3MLiaLFwBWo4wTiD/SHKeMzIm4dgmHdneW5VNHQJ3SkF0V2o349Qqm8/u6pjiOXwxGYtutwfIYiRTtjiKZcjd39Va9CKDJsXoD8hDc+TH5Qv30YTo071myxQI14m/D0lQPKJF751b38zpgxb/t80gHNoDfWnvIahCqeIzQVOsozszDdz3yB2PWwXjDz1D14Z9hcMWS2tJG1GtBc38LKhZ7uWLpVPp6kpbeCKzkVk7VTW+aiXYQbhmsCWoPQl/gZlCtNzGOQsbl+pr3bl+7f0U2Ws+GHww="
-matrix:
+
+jobs:
   include:
     - stage: build
-      language: clojure
       script:
         - lein test
         - lein uberjar
@@ -25,10 +25,5 @@ matrix:
         - docker tag dda-smeagol-crate domaindrivenarchitecture/dda-smeagol-crate:SNAPSHOT
         - docker push $DOCKER_USERNAME/dda-smeagol-crate
     - stage: integrationtest
-      language: python
-      python:
-        - "3.6"
-      install:
-        - pip install docker
       script:
         - docker build -t dda-smeagol-crate-test --file integration/docker/test/Dockerfile .

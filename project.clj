@@ -38,6 +38,7 @@
                        :resource-paths ["uberjar/resources"]
                        :aot :all
                        :main dda.pallet.dda-smeagol-crate.main
+                       :uberjar-name "dda-smeagol-standalone.jar"
                        :dependencies [[org.clojure/tools.cli "0.4.1"]
                                       [ch.qos.logback/logback-classic "1.3.0-alpha4"]
                                       [org.slf4j/jcl-over-slf4j "1.8.0-beta2"]]}}
