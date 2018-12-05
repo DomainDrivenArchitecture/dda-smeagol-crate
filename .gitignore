@@ -11,7 +11,8 @@ pom.xml.asc
 .lein-plugins/
 .lein-failures
 .nrepl-port
-.cpcache/
+Cache/
 /bin/
 .settings/
+.project
 /logs/
