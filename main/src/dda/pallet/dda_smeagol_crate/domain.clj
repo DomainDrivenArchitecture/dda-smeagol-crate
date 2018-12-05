@@ -19,6 +19,7 @@
     [dda.pallet.commons.secret :as secret]
     [dda.pallet.dda-smeagol-crate.domain.smeagol :as smeagol]
     [dda.pallet.dda-smeagol-crate.domain.git :as git]
+    [dda.pallet.dda-smeagol-crate.domain.user :as user]
     [dda.pallet.dda-smeagol-crate.infra :as infra]))
 
 (def SmeagolDomain
@@ -26,6 +27,9 @@
    (s/optional-key :smeagol-passwd) smeagol/SmeagolPasswd ;; reference from top level package is forbidden! moved to top-level
                                                           ;; not optional - passwords should be allways defined  ...
                                                           ;; smeagol-users is maybe a better name?
+   :server-fqdn s/Str
+   :user-passwd user/ClearPassword
+   :user-ssh user/Ssh
    :git-credential git/GitCredential
    :git-content-repo git/Repository})
 
@@ -41,16 +45,13 @@
     (smeagol/tomcat-domain-configuration tomcat-xmx-megabyte)))
 
 (s/defn ^:always-validate
-  git-infra-configuration
-  [domain-config :- SmeagolDomain]
-  (let [{:keys [git-credential git-content-repo]} domain-config]
-    (git/infra-configuration infra/facility git-credential git-content-repo)))
-
-(s/defn ^:always-validate
   infra-configuration
   [domain-config :- SmeagolDomain]
-  (let [{:keys [smeagol-passwd]} domain-config]
+  (let [{:keys [git-credential git-content-repo server-fqdn
+                user-passwd user-ssh
+                smeagol-passwd]} domain-config]
     (merge
-      (git-infra-configuration domain-config)
+      (user/infra-configuration user-passwd user-ssh)
+      (git/infra-configuration server-fqdn git-credential git-content-repo)
       (smeagol/smeagol-infra-configuration infra/facility
         smeagol-passwd))))

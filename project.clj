@@ -6,6 +6,7 @@
   :dependencies [[dda/dda-pallet "2.2.2"]
                  [prismatic/schema "1.1.9"]
                  [dda/dda-git-crate "2.1.4-SNAPSHOT"]
+                 [dda/dda-user-crate "1.0.6-SNAPSHOT"]
                  [dda/dda-tomcat-crate "2.0.2-SNAPSHOT"]]
   :source-paths ["main/src"]
   :resource-paths ["main/resources"]

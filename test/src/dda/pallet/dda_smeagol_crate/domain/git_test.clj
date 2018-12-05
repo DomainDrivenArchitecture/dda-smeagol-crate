@@ -19,7 +19,7 @@
    [schema.core :as s]
    [dda.pallet.dda-smeagol-crate.domain.git :as sut]))
 
-;(s/set-fn-validation! true)
+(s/set-fn-validation! true)
 
 (def git-domain
   {:input {:git-credential {:host "github.com"
