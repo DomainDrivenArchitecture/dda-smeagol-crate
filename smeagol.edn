@@ -9,4 +9,5 @@
                     :repo-name "a-private-repo"
                     :protocol :https
                     :server-type :github}
+ :server-fqdn "a.server.name"
  :smeagol-passwd {:admin {:admin true, :email "admin@localhost", :password "admin"}}}
