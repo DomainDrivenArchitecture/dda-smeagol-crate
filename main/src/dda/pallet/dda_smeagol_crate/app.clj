@@ -32,7 +32,6 @@
 (def InfraResult domain/InfraResult)
 
 (def SmeagolDomain domain/SmeagolDomain)
-
 (def SmeagolDomainResolved domain/SmeagolDomainResolved)
 
 (def SmeagolAppConfig
@@ -44,7 +43,7 @@
                 InfraResult)}})
 
 (s/defn ^:always-validate
-  app-configuration-resolved :- SmeagolAppConfig
+  app-configuration-resolved ; TODO: Reactivate as soon as tomcat has been moved out :- SmeagolAppConfig
   [domain-config :- SmeagolDomainResolved
    & options]
   (let [{:keys [group-key] :or {group-key infra/facility}} options]
@@ -53,7 +52,7 @@
       (domain/infra-configuration domain-config)}}))
 
 (s/defn ^:always-validate
-  app-configuration :- SmeagolAppConfig
+  app-configuration ; TODO: Reactivate as soon as tomcat has been moved out :- SmeagolAppConfig
   [domain-config :- SmeagolDomain
    & options]
   (let [resolved-domain-config (secret/resolve-secrets domain-config SmeagolDomain)]
@@ -62,8 +61,8 @@
 (s/defmethod ^:always-validate
   core-app/group-spec infra/facility
   [crate-app
-   domain-config :- SmeagolDomain]
-  (let [app-config (app-configuration domain-config)]
+   domain-config :- SmeagolDomainResolved]
+  (let [app-config (app-configuration-resolved domain-config)]
     (core-app/pallet-group-spec
       app-config [(config-crate/with-config app-config)
                   user/with-user
@@ -74,5 +73,5 @@
 (def crate-app (core-app/make-dda-crate-app
                  :facility infra/facility
                  :domain-schema SmeagolDomain
-                 :domain-schema-resolved SmeagolDomain
+                 :domain-schema-resolved SmeagolDomainResolved
                  :default-domain-file "smeagol.edn"))

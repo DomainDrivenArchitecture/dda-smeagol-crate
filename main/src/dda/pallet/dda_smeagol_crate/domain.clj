@@ -39,14 +39,14 @@
 
 (s/defn ^:always-validate
   tomcat-domain-configuration
-  [domain-config :- SmeagolDomain]
+  [domain-config :- SmeagolDomainResolved]
   (let [{:keys [tomcat-xmx-megabyte smeagol-passwd]
          :or {tomcat-xmx-megabyte 2560}} domain-config]
     (smeagol/tomcat-domain-configuration tomcat-xmx-megabyte)))
 
 (s/defn ^:always-validate
   infra-configuration
-  [domain-config :- SmeagolDomain]
+  [domain-config :- SmeagolDomainResolved]
   (let [{:keys [git-credential git-content-repo server-fqdn
                 user-passwd user-ssh
                 smeagol-passwd]} domain-config]
