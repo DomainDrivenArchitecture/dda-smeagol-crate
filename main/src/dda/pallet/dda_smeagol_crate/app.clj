@@ -21,6 +21,7 @@
     [dda.config.commons.map-utils :as mu]
     [dda.pallet.core.app :as core-app]
     [dda.pallet.dda-tomcat-crate.app :as tomcat]
+    [dda.pallet.dda-user-crate.app :as user]
     [dda.pallet.dda-git-crate.app :as git]
     [dda.pallet.dda-config-crate.infra :as config-crate]
     [dda.pallet.dda-smeagol-crate.infra :as infra]
@@ -36,20 +37,20 @@
 
 (def SmeagolAppConfig
   {:group-specific-config
-   {s/Keyword (merge tomcat/InfraResult
-                     InfraResult)}})
+   {s/Keyword (merge
+                user/InfraResult
+                git/InfraResult
+                tomcat/InfraResult
+                InfraResult)}})
 
 (s/defn ^:always-validate
   app-configuration-resolved :- SmeagolAppConfig
   [domain-config :- SmeagolDomainResolved
    & options]
   (let [{:keys [group-key] :or {group-key infra/facility}} options]
-    (mu/deep-merge
-      (tomcat/app-configuration
-         (domain/tomcat-domain-configuration domain-config) :group-key group-key)
-      {:group-specific-config
-       {group-key
-        (domain/infra-configuration domain-config)}})))
+    {:group-specific-config
+     {group-key
+      (domain/infra-configuration domain-config)}}))
 
 (s/defn ^:always-validate
   app-configuration :- SmeagolAppConfig
@@ -65,6 +66,7 @@
   (let [app-config (app-configuration domain-config)]
     (core-app/pallet-group-spec
       app-config [(config-crate/with-config app-config)
+                  user/with-user
                   git/with-git
                   tomcat/with-tomcat
                   with-smeagol])))
