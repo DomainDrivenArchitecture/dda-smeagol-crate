@@ -1,13 +1,19 @@
-{:user-passwd {:plain "xxx"}
- :user-ssh {:ssh-authorized-keys [{:plain "ssh-rsa AAAA..LL comment"}]
-            :ssh-key {:public-key {:plain "ssh-rsa AAAA..LL comment"}
-                      :private-key {:plain "SOME_PRIVATE_SSH_KEY"}}}
- :git-credential {:host "github.com"
-                  :protocol :https
-                  :user-name {:plain "smeagol"}}
- :git-content-repo {:host "github.com"
-                    :repo-name "a-private-repo"
-                    :protocol :https
-                    :server-type :github}
- :server-fqdn "a.server.name"
- :smeagol-passwd {:admin {:admin true, :email "admin@localhost", :password "admin"}}}
+{:user-passwd {:plain "xxx"}                                  ; smeagol user pwd on os level
+ :user-ssh
+  {:ssh-authorized-keys [{:plain "ssh-rsa AAAA..LL comment"}] ; ssh authorized keys
+   :ssh-key {:public-key {:plain "ssh-rsa AAAA..LL comment"}  ; ssh-key for git sync
+             :private-key {:plain "SOME_PRIVATE_SSH_KEY"}}}
+ :git-credential
+  {:host "github.com"                                         ; credentials for content repo
+   :protocol :ssh
+   :user-name {:plain "smeagol"}}
+ :git-content-repo                                            ; the content repo spec
+  {:host "github.com"                                         ; e.g. for github. Gitlab or gitblit will also work.
+   :repo-name "a-private-repo"
+   :protocol :ssh
+   :server-type :github}
+ :server-fqdn "a.server.name"                                 ; the httpd server name
+ :smeagol-passwd
+    {:admin {:admin true,                                     ; smeagol users
+             :email "admin@localhost",
+             :password {:plain "admin"}}}}
