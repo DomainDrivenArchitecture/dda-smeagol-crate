@@ -9,8 +9,8 @@ This crate is part of [dda-pallet](https://domaindrivenarchitecture.org/pages/dd
 ## compatability
 dda-pallet is compatible to the following versions
 * pallet 0.8.x
-* clojure 1.7
-* (x)ubunutu 16.04 / 18.04
+* clojure 1.9
+* (x)ubunutu 18.04
 
 ## Features
 This crate provisions over ssh or local a [smeagol](https://github.com/journeyman-cc/smeagol) wiki to a plain ubuntu system. One shoot provisioning is supported but also continuous configuration application is possible.
