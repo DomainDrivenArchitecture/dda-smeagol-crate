@@ -38,13 +38,6 @@
 (def InfraResult {infra/facility infra/SmeagolInfra})
 
 (s/defn ^:always-validate
-  tomcat-domain-configuration
-  [domain-config :- SmeagolDomainResolved]
-  (let [{:keys [tomcat-xmx-megabyte smeagol-passwd]
-         :or {tomcat-xmx-megabyte 2560}} domain-config]
-    (smeagol/tomcat-domain-configuration tomcat-xmx-megabyte)))
-
-(s/defn ^:always-validate
   user-domain-configuration
   [domain-config :- SmeagolDomainResolved]
   (let [{:keys [user-passwd user-ssh]} domain-config]
@@ -60,7 +53,7 @@
   httpd-domain-configuration
   [domain-config :- SmeagolDomainResolved]
   (let [{:keys [server-fqdn proxy-port] :or {proxy-port "8080"}} domain-config]
-    (httpd/infra-configuration server-fqdn proxy-port)))
+    (httpd/domain-configuration server-fqdn proxy-port)))
 
 (s/defn ^:always-validate
   infra-configuration

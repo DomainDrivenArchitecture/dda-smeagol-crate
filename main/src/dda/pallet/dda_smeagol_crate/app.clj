@@ -54,7 +54,7 @@
         (domain/user-domain-configuration resolved-domain-config) :group-key group-key)
       (git/app-configuration-resolved
         (domain/git-domain-configuration resolved-domain-config) :group-key group-key)
-      (httpd/app-configuration-resolved
+      (httpd/single-proxy-app-configuration
        (domain/httpd-domain-configuration resolved-domain-config) :group-key group-key)
       {:group-specific-config
        {group-key
