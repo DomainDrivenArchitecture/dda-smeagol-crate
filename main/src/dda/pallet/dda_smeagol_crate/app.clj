@@ -71,6 +71,7 @@
   (let [app-config (app-configuration-resolved domain-config)]
     (core-app/pallet-group-spec
       app-config [(config-crate/with-config app-config)
+                  serverspec/with-serverspec
                   user/with-user
                   git/with-git])))
                   ;tomcat/with-tomcat
