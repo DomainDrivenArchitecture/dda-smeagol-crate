@@ -45,13 +45,22 @@
     (smeagol/tomcat-domain-configuration tomcat-xmx-megabyte)))
 
 (s/defn ^:always-validate
+  user-domain-configuration
+  [domain-config :- SmeagolDomainResolved]
+  (let [{:keys [user-passwd user-ssh]} domain-config]
+    (user/domain-configuration user-passwd user-ssh)))
+
+(s/defn ^:always-validate
+  git-domain-configuration
+  [domain-config :- SmeagolDomainResolved]
+  (let [{:keys [git-credential git-content-repo server-fqdn]} domain-config]
+    (git/domain-configuration server-fqdn git-credential git-content-repo)))
+
+
+(s/defn ^:always-validate
   infra-configuration
   [domain-config :- SmeagolDomainResolved]
   (let [{:keys [git-credential git-content-repo server-fqdn
                 user-passwd user-ssh
                 smeagol-passwd]} domain-config]
-    (merge
-      (user/infra-configuration user-passwd user-ssh)
-      (git/infra-configuration server-fqdn git-credential git-content-repo))))
-      ;(smeagol/smeagol-infra-configuration infra/facility
-      ;  smeagol-passwd))))
+    (smeagol/smeagol-infra-configuration infra/facility smeagol-passwd)))

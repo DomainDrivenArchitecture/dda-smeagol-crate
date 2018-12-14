@@ -20,10 +20,11 @@
     [dda.pallet.commons.secret :as secret]
     [dda.config.commons.map-utils :as mu]
     [dda.pallet.core.app :as core-app]
-    [dda.pallet.dda-tomcat-crate.app :as tomcat]
+    [dda.pallet.dda-config-crate.infra :as config-crate]
+    [dda.pallet.dda-serverspec-crate.app :as serverspec]
     [dda.pallet.dda-user-crate.app :as user]
     [dda.pallet.dda-git-crate.app :as git]
-    [dda.pallet.dda-config-crate.infra :as config-crate]
+    [dda.pallet.dda-tomcat-crate.app :as tomcat]
     [dda.pallet.dda-smeagol-crate.infra :as infra]
     [dda.pallet.dda-smeagol-crate.domain :as domain]))
 
@@ -38,18 +39,23 @@
   {:group-specific-config
    {s/Keyword (merge
                 user/InfraResult
-                git/InfraResult)}})
+                git/InfraResult
                 ;tomcat/InfraResult
-                ;InfraResult)}})
+                InfraResult)}})
 
 (s/defn ^:always-validate
-  app-configuration-resolved ; TODO: Reactivate as soon as tomcat has been moved out :- SmeagolAppConfig
-  [domain-config :- SmeagolDomainResolved
+  app-configuration-resolved :- SmeagolAppConfig
+  [resolved-domain-config :- SmeagolDomainResolved
    & options]
   (let [{:keys [group-key] :or {group-key infra/facility}} options]
-    {:group-specific-config
-     {group-key
-      (domain/infra-configuration domain-config)}}))
+    (mu/deep-merge
+      (user/app-configuration-resolved
+        (domain/user-domain-configuration resolved-domain-config) :group-key group-key)
+      (git/app-configuration-resolved
+        (domain/git-domain-configuration resolved-domain-config) :group-key group-key)
+      {:group-specific-config
+       {group-key
+        (domain/infra-configuration resolved-domain-config)}})))
 
 (s/defn ^:always-validate
   app-configuration ; TODO: Reactivate as soon as tomcat has been moved out :- SmeagolAppConfig

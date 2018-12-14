@@ -38,10 +38,3 @@
             {:ssh-authorized-keys ssh-authorized-keys})
           (when (contains? ssh :ssh-key)
             {:ssh-key ssh-key}))}))
-
-(s/defn
-  infra-configuration
-  [user-password :- ClearPasswordResolved
-   ssh :- SshResolved]
-  (user-domain/infra-configuration
-    (domain-configuration user-password ssh)))
