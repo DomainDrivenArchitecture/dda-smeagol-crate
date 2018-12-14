@@ -37,12 +37,6 @@
    {:name "TIMBRE_LEVEL" :value ":info"}
    {:name "PORT" :value "80"}])
 
-;; Review jem 2018_12_03: why not move tomcat into own ns ? - or remove it ;-)
-(s/defn tomcat-domain-configuration
-  [tomcat-xmx-megabyte]
-  {:app-server
-   {:xmx-megabyte tomcat-xmx-megabyte}})            ; e.g. 6072 or 2560
-
 (s/defn smeagol-infra-configuration
   [facility :- s/Keyword
    smeagol-passwd :- schema/SmeagolPasswd]

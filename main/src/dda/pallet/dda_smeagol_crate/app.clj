@@ -61,7 +61,7 @@
         (domain/infra-configuration resolved-domain-config)}})))
 
 (s/defn ^:always-validate
-  app-configuration ; TODO: Reactivate as soon as tomcat has been moved out :- SmeagolAppConfig
+  app-configuration :- SmeagolAppConfig
   [domain-config :- SmeagolDomain
    & options]
   (let [resolved-domain-config (secret/resolve-secrets domain-config SmeagolDomain)]
