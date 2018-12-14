@@ -37,12 +37,12 @@
    \newline
    ["dda-smeagol-crate install & configures a smeagol wiki having https & a autosynced content git-repo"
     ""
-    "Usage: java -jar dda-smeagol-standalone.jar [options] smeagol-config-file"
+    "Usage: java -jar dda-smeagol-standalone.jar [options] smeagol.edn"
     ""
     "Options:"
     options-summary
     ""
-    "smeagol-config-file"
+    "smeagol.edn"
     "  - follows the edn format."
     "  - has to be a valid SmeagolDomainConfig (see: https://github.com/DomainDrivenArchitecture/dda-smeagol-crate)"
     ""]))
