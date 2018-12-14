@@ -41,27 +41,3 @@
            (sut/domain-configuration
              (get-in user-domain [:input :user-password])
              (get-in user-domain [:input :user-ssh]))))))
-
-(def user-infra
-  {:output {:dda-user
-            {:smeagol
-             {:clear-password "xxx",
-              :ssh-authorized-keys
-              [{:type "ssh-rsa",
-                :public-key "AAAA..LL",
-                :comment "comment"}],
-              :ssh-key
-              {:public-key
-               {:type "ssh-rsa",
-                :public-key "AAAA..LL",
-                :comment "comment"},
-               :private-key "SOME_PRIVATE_SSH_KEY"},
-              :settings #{:bashrc-d}}}}})
-
-
-(deftest test-infra-creation
-  (testing
-    (is (= (:output user-infra)
-           (sut/infra-configuration
-              (get-in user-domain [:input :user-password])
-              (get-in user-domain [:input :user-ssh]))))))

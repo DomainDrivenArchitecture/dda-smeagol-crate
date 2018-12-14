@@ -47,32 +47,3 @@
              "domain"
              (get-in git-domain [:input :git-credential])
              (get-in git-domain [:input :git-content-repo]))))))
-
-(def git-infra
-  {:output {:dda-git
-             {:smeagol
-              {:config {:email "smeagol@domain"},
-               :file-fact-keyword
-               :dda.pallet.dda-serverspec-crate.infra.fact.file/file,
-               :trust
-               [{:pin-fqdn-or-ip {:host "github.com", :port 443}}],
-               :repo
-               [{:repo
-                 "https://smeagol@github.com:443//a-private-repo.git",
-                 :local-dir
-                 "/home/smeagol/repo/smeagol/a-private-repo",
-                 :settings #{:sync}}]}},
-             :dda-servertest
-             {:file-fact
-              {:_home_smeagol_repo_smeagol_a-private-repo
-               {:path
-                "/home/smeagol/repo/smeagol/a-private-repo"}}}}})
-
-
-(deftest test-infra-creation
-  (testing
-    (is (= (:output git-infra)
-           (sut/infra-configuration
-             "domain"
-             (get-in git-domain [:input :git-credential])
-             (get-in git-domain [:input :git-content-repo]))))))
