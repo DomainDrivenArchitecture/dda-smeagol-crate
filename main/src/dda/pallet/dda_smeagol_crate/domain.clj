@@ -52,6 +52,6 @@
                 smeagol-passwd]} domain-config]
     (merge
       (user/infra-configuration user-passwd user-ssh)
-      (git/infra-configuration server-fqdn git-credential git-content-repo)
-      (smeagol/smeagol-infra-configuration infra/facility
-        smeagol-passwd))))
+      (git/infra-configuration server-fqdn git-credential git-content-repo))))
+      ;(smeagol/smeagol-infra-configuration infra/facility
+      ;  smeagol-passwd))))

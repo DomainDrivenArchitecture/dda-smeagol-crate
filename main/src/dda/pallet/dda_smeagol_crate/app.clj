@@ -38,9 +38,9 @@
   {:group-specific-config
    {s/Keyword (merge
                 user/InfraResult
-                git/InfraResult
-                tomcat/InfraResult
-                InfraResult)}})
+                git/InfraResult)}})
+                ;tomcat/InfraResult
+                ;InfraResult)}})
 
 (s/defn ^:always-validate
   app-configuration-resolved ; TODO: Reactivate as soon as tomcat has been moved out :- SmeagolAppConfig
@@ -66,9 +66,9 @@
     (core-app/pallet-group-spec
       app-config [(config-crate/with-config app-config)
                   user/with-user
-                  git/with-git
-                  tomcat/with-tomcat
-                  with-smeagol])))
+                  git/with-git])))
+                  ;tomcat/with-tomcat
+                  ;with-smeagol])))
 
 (def crate-app (core-app/make-dda-crate-app
                  :facility infra/facility
