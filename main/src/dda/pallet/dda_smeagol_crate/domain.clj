@@ -20,6 +20,7 @@
     [dda.pallet.dda-smeagol-crate.domain.smeagol :as smeagol]
     [dda.pallet.dda-smeagol-crate.domain.git :as git]
     [dda.pallet.dda-smeagol-crate.domain.user :as user]
+    [dda.pallet.dda-smeagol-crate.domain.httpd :as httpd]
     [dda.pallet.dda-smeagol-crate.infra :as infra]))
 
 (def SmeagolDomain
@@ -56,6 +57,11 @@
   (let [{:keys [git-credential git-content-repo server-fqdn]} domain-config]
     (git/domain-configuration server-fqdn git-credential git-content-repo)))
 
+(s/defn ^:always-validate
+  httpd-domain-configuration
+  [domain-config :- SmeagolDomainResolved]
+  (let [{:keys [server-fqdn proxy-port] :or {proxy-port "8080"}} domain-config]
+    (httpd/infra-configuration server-fqdn proxy-port)))
 
 (s/defn ^:always-validate
   infra-configuration
