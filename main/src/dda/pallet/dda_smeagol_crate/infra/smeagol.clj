@@ -17,18 +17,12 @@
 (ns dda.pallet.dda-smeagol-crate.infra.smeagol
   (:require
     [schema.core :as s]
+    [clojure.string :as string]
+    [pallet.crate :as crate]
     [pallet.actions :as actions]
+    [clojure.tools.logging :as logging]
+    [dda.pallet.dda-serverspec-crate.infra :as fact]
     [dda.pallet.dda-smeagol-crate.infra.schema :as schema]))
-
-(defn smeagol-remote-directory-unzip
-  "Unzip and install files from a zip from a URL"
-  [target-dir download-url 
-   & {:keys [owner mode]
-      :or {owner "root" mode "644"}}]
-  (actions/remote-directory
-    target-dir
-    :url download-url
-    :unpack :unzip))
 
 ;; lets embed config directly into war by replacing `resources/config.edn`
 (s/defn create-smeagol-config
@@ -53,13 +47,6 @@
        :mode "755"
        :content (pr-str smeagol-config)))))
 
-(defn smeagol-create-war
-  [repo-location filename]
-  (actions/exec-checked-script
-    (str "Create smeagol war file")
-    ("cd" ~repo-location "&&" "lein bower install")
-    ("cd" ~repo-location "&&" "lein ring uberwar" ~filename)))
-
 (s/defn create-dirs
   "create directories
    -p no error if existing, make parent directories as needed"
@@ -81,14 +68,33 @@
            ("chown" "-R" ~smeagol-owner ~destination)
            ("chgrp" "-R" ~smeagol-owner ~destination))))))
 
+(s/defn path-to-keyword :- s/Keyword
+  [path :- s/Str]
+  (keyword (string/replace path #"[/]" "_")))
+
+; TODO where should it come from?
+(def file-fact-keyword :dda.pallet.dda-serverspec-crate.infra.fact.file/file)
+
+(s/defn download-uberjar
+  [uberjar :- schema/SmeagolUberjar]
+  (let [{:keys [path url owner size]} uberjar
+        all-facts (crate/get-settings
+                   fact/fact-facility
+                   {:instance-id (crate/target-node)})
+        file-fact (file-fact-keyword all-facts)
+        fact-path (path-to-keyword path)]
+    (actions/plan-when (let [{:keys [fact-exist? fact-size-in-bytes] :as actual}
+                             (fact-path (:out @file-fact))]
+                         ;; (logging/info (pr-str {:actual actual :expected uberjar}))
+                         (not (and fact-exist? (= fact-size-in-bytes size))))
+                       (actions/remote-file path
+                                            :url url
+                                            :owner owner))))
+
 (s/defn install-smeagol
   [config :- schema/SmeagolInfra]
-  (let [{:keys [repo-download-source smeagol-parent-dir smeagol-dir]} config
-        smeagol-repo (str smeagol-parent-dir smeagol-dir)
-        war-filename "smeagol.war"
-        war-location (str smeagol-repo "target/" war-filename)]
-    (smeagol-remote-directory-unzip smeagol-parent-dir repo-download-source)
+  (let [{:keys [uberjar]} config]
+    (download-uberjar uberjar)
     (create-smeagol-config config)
-    (smeagol-create-war smeagol-repo war-filename)
     (create-dirs config)
     (move-resources-to-directories config)))
