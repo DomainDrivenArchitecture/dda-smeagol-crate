@@ -27,36 +27,41 @@
   (-> (string/join "/" (vec paths))
       (string/replace ,  #"[\\/]+" "/")))
 
-(defn- resource-location-helper
-  [smeagol-location]
-  {:passwd {:name "passwd" :source (str smeagol-location "resources/passwd") :destination "/usr/local/etc/passwd"}
-   :config-edn {:name "config-edn" :source (str smeagol-location "resources/config.edn") :destination "/usr/local/etc/config.edn"}
-   :content-dir {:name "content-dir" :source (str smeagol-location "resources/public/content") :destination "/usr/local/etc/content"}})
+(s/defn environment
+  [root :- s/Str]
+  {:passwd {:env "SMEAGOL_PASSWD" :value (path-join root "passwd")}
+   :config-edn {:env "SMEAGOL_CONFIG" :value (path-join root "config.edn")}
+   ;; TODO git-crate infra result?!
+   :content-dir {:env "SMEAGOL_CONTENT_DIR" :value (path-join root "repo" "smeagol" "dda")}
+   :fonts {:env "TIMBRE_DEFAULT_STACKTRACE_FONTS" :value "{}"}
+   :log-level {:env "TIMBRE_LEVEL" :value ":info"}
+   :site-title {:env "SMEAGOL_SITE_TITLE" :value "DomainDrivenArchitecture"}
+   :default-locale {:env "SMEAGOL_DEFAULT_LOCALE" :value "en-GB"}
+   ;; TODO unify with httpd
+   :port {:env "PORT" :value "8080"}})
 
 (def SmeagolPasswd schema/SmeagolPasswd)
-
-(def environment-variables
-  [{:name "SMEAGOL_CONFIG" :value "/usr/local/etc/config.edn"}
-   {:name "SMEAGOL_CONTENT_DIR" :value "/usr/local/etc/content"}
-   {:name "SMEAGOL_PASSWD" :value "/usr/local/etc/passwd"}
-   {:name "TIMBRE_DEFAULT_STACKTRACE_FONTS" :value "{}"}
-   {:name "TIMBRE_LEVEL" :value ":info"}
-   {:name "PORT" :value "80"}])
 
 (def smeagol-releases "https://api.github.com/repos/DomainDrivenArchitecture/smeagol/releases")
 
 (def ReleaseAsset
-  (open-schema {:browser_download_url s/Str :name s/Str :content_type s/Str :label s/Str}))
+  (open-schema {:browser_download_url s/Str :name s/Str :content_type s/Str :label (s/maybe s/Str)}))
 
-(s/defn uberjar-release-asset :- ReleaseAsset
+;; TODO maybe search by label? can travis specify content-type?
+(s/defn jar-asset?
+  [asset :- ReleaseAsset]
+  (-> asset :content_type (= "application/x-java-archive")))
+
+(s/defn uberjar-release-asset ; :- ReleaseAsset
   []
   (->> (http/get smeagol-releases {:as :json})
        :body
-       first ;; TODO find by git sha?
+       (filter #(some jar-asset? (:assets %)))
+       first
        :assets
-       ;; TODO filter by -> :content-type (= "application/x-java-archive") or by :label?
-       (filter #(-> % :name (string/ends-with? ".jar")))
-       first))
+       (filter jar-asset?)
+       first
+       ))
 
 (s/defn uberjar-infra
   [smeagol-parent-dir :- s/Str
@@ -68,18 +73,15 @@
 
 (s/defn smeagol-infra-configuration
   [facility :- s/Keyword
-   smeagol-passwd :- schema/SmeagolPasswd]
-  (let [smeagol-parent-dir "/var/lib/"
-        smeagol-dir "smeagol-master/"
-        smeagol-owner "smeagol"
-        smeagol-asset (uberjar-release-asset)
-        {:keys [path] :as uberjar-config} (uberjar-infra smeagol-parent-dir smeagol-asset)]
+   passwd :- schema/SmeagolPasswd]
+  (let [smeagol-owner "smeagol"
+        ;; TODO user-crate infra result?!
+        smeagol-parent-dir (path-join "/home" smeagol-owner)
+        {:keys [path] :as uberjar-config} (uberjar-infra smeagol-parent-dir (uberjar-release-asset))]
     {facility
-     {:smeagol-parent-dir smeagol-parent-dir
-      :smeagol-passwd smeagol-passwd
-      :smeagol-owner smeagol-owner
-      :uberjar (assoc uberjar-config :owner smeagol-owner)
-      :resource-locations (resource-location-helper (str smeagol-parent-dir smeagol-dir))
-      :environment-variables environment-variables}
+     {:passwd passwd
+      :owner smeagol-owner
+      :uberjar uberjar-config
+      :env (environment smeagol-parent-dir)}
      serverspec-infra/facility
-     {:file-fact {:uberjar {:path path}}}}))
+     {:file-fact {:uberjar {:path path}}}})) ;; TODO make use of `:uberjar` kw in infra/download-uberjar

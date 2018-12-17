@@ -19,54 +19,40 @@
     [schema.core :as s]
     [clojure.string :as string]
     [pallet.crate :as crate]
+    [pallet.crate.initd] ;; service-supervisor impl
+    [pallet.crate.service :refer [service-supervisor-config service-supervisor]]
+    [pallet.script.lib :refer [etc-init]]
+    [selmer.parser :as selmer]
     [pallet.actions :as actions]
     [clojure.tools.logging :as logging]
     [dda.pallet.dda-serverspec-crate.infra :as fact]
     [dda.pallet.dda-smeagol-crate.infra.schema :as schema]))
 
-;; lets embed config directly into war by replacing `resources/config.edn`
 (s/defn create-smeagol-config
   [config :- schema/SmeagolInfra]
-  (let [{:keys [resource-locations smeagol-owner]} config
-        {:keys [config-edn passwd content-dir]} resource-locations
-        {:keys [source]} config-edn
-        ;; consider read config contents and rewrite back
-        smeagol-config {:content-dir (:destination content-dir)
-                        :passwd (:destination passwd)
-                        :site-title "Smeagol"
-                        :default-locale "en-GB"
-                        :formatters {"vega" 'smeagol.formatting/process-vega
-                                     "vis" 'smeagol.formatting/process-vega
-                                     "mermaid" 'smeagol.formatting/process-mermaid
-                                     "backticks" 'smeagol.formatting/process-backticks}
-                        :log-level :info}]
-    (if source
-      (actions/remote-file
-       source
-       :owner smeagol-owner
-       :mode "755"
-       :content (pr-str smeagol-config)))))
+  (let [{:keys [env owner passwd]} config
+        {:keys [config-edn passwd content-dir]} env
+        config-edn-path (:value config-edn)]
+    (actions/remote-file
+     config-edn-path
+     :literal true
+     :owner owner
+     :mode "755"
+     :content (selmer/render-file
+               "config_edn.template"
+               {:content-dir (:value content-dir)
+                :passwd-path (:value passwd)}))))
 
-(s/defn create-dirs
-  "create directories
-   -p no error if existing, make parent directories as needed"
-  [config :- schema/SmeagolInfra]
-  (let [directories (map :destination (:resource-locations config))
-        owner (:smeagol-owner config)]
-    (actions/directories directories :owner owner)))
-
-(s/defn move-resources-to-directories
-  "Move the resources in the git repository to the newly created
-   directories"
-  [config :- schema/SmeagolInfra]
-  (let [{:keys [smeagol-owner]} config]
-    (doseq [[_ resource] (:resource-locations config)]
-      (let [{:keys [source destination]} resource]
-        (actions/exec-checked-script
-           (str "Move the resources in the git repository to the newly created directories\n" config)
-           ("cp" "-r" ~source ~destination)
-           ("chown" "-R" ~smeagol-owner ~destination)
-           ("chgrp" "-R" ~smeagol-owner ~destination))))))
+(s/defn create-passwd
+  [env :- schema/SmeagolEnv
+   owner :- s/Str
+   passwd :- schema/SmeagolPasswd]
+  (actions/remote-file
+   (:value env)
+   :literal true
+   :owner owner
+   :mode "755"
+   :content passwd))
 
 (s/defn path-to-keyword :- s/Keyword
   [path :- s/Str]
@@ -76,8 +62,9 @@
 (def file-fact-keyword :dda.pallet.dda-serverspec-crate.infra.fact.file/file)
 
 (s/defn download-uberjar
-  [uberjar :- schema/SmeagolUberjar]
-  (let [{:keys [path url owner size]} uberjar
+  [owner :- s/Str
+   uberjar :- schema/SmeagolUberjar]
+  (let [{:keys [path url size]} uberjar
         all-facts (crate/get-settings
                    fact/fact-facility
                    {:instance-id (crate/target-node)})
@@ -91,10 +78,42 @@
                                             :url url
                                             :owner owner))))
 
+(s/defn ->env-str
+  [envs :- [schema/SmeagolEnv]]
+  (string/join " "
+               (map #(str (:env %) "=" (:value %)) envs)))
+
+(s/defn initd-script
+  [env :- {s/Keyword schema/SmeagolEnv}
+   uberjar :- schema/SmeagolUberjar]
+  (let [env-str (-> env vals ->env-str)
+        jar-path (:path uberjar)]
+    (actions/remote-file
+     (str (etc-init) "/" "smeagol")
+     :literal true
+     :owner "root"
+     :mode "755"
+     :content (selmer/render-file
+               "smeagol-initd.template"
+               {:env-str env-str
+                :jar-path jar-path}))))
+
+(s/defn smeagol-service
+  [env uberjar]
+  (do
+    (service-supervisor ;-config
+     :initd
+     {:service-name "smeagol"}
+     ;; TODO leave only `service-supervisor-config`, place action in proper phase
+     {:action :restart})))
+
+;; TODO ugly imperative style
 (s/defn install-smeagol
   [config :- schema/SmeagolInfra]
-  (let [{:keys [uberjar]} config]
-    (download-uberjar uberjar)
+  (let [{:keys [uberjar passwd owner env]} config]
+    ;; TODO shared :owner like `with-action-options`?!
     (create-smeagol-config config)
-    (create-dirs config)
-    (move-resources-to-directories config)))
+    (create-passwd (:passwd env) owner passwd)
+    (download-uberjar owner uberjar)
+    (initd-script env uberjar)
+    (smeagol-service (vals env) uberjar)))
