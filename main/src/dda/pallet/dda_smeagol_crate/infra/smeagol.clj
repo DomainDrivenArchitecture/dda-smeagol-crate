@@ -69,14 +69,14 @@
                    fact/fact-facility
                    {:instance-id (crate/target-node)})
         file-fact (file-fact-keyword all-facts)
-        fact-path (path-to-keyword path)]
-    (actions/plan-when (let [{:keys [fact-exist? fact-size-in-bytes] :as actual}
-                             (fact-path (:out @file-fact))]
+        fact-path (path-to-keyword path
+    ;(actions/plan-when (let [{:keys [fact-exist? fact-size-in-bytes] :as actual}
+    ;                         (fact-path (:out @file-fact))
                          ;; (logging/info (pr-str {:actual actual :expected uberjar}))
-                         (not (and fact-exist? (= fact-size-in-bytes size))))
+    ;                     (not (and fact-exist? (= fact-size-in-bytes size)))
                        (actions/remote-file path
                                             :url url
-                                            :owner owner))))
+                                            :owner owner))]))
 
 (s/defn ->env-str
   [envs :- [schema/SmeagolEnv]]

@@ -80,7 +80,7 @@
 
 (s/defn smeagol-infra-configuration
   [facility :- s/Keyword
-   passwd :- schema/SmeagolPasswd]
+   passwd :- SmeagolPasswd]
   (let [smeagol-owner "smeagol"
         smeagol-parent-dir (path-join "/home" smeagol-owner)
         uberjar-config {:path "/home/smeagol/repo/dda"
@@ -92,6 +92,7 @@
      {:passwd passwd
       :owner smeagol-owner
       :uberjar uberjar-config
-      :env (environment smeagol-parent-dir)}
-     serverspec-infra/facility
-     {:file-fact {:uberjar {:path path}}}})) ;; TODO make use of `:uberjar` kw in infra/download-uberjar
+      :env (environment smeagol-parent-dir)}}))
+    ; TODO: make things as simple as possible - just download always
+    ;serverspec-infra/facility
+     ;{:file-fact {:uberjar {:path path}}}})) ;; TODO make use of `:uberjar` kw in infra/download-uberjar
