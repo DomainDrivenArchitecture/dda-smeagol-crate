@@ -15,6 +15,6 @@
    :server-type :github}
  :server-fqdn "a.server.name"                                 ; the httpd server name
  :smeagol-passwd
-    {:admin {:admin true,                                     ; smeagol users
-             :email "admin@localhost",
-             :password "admin" #_{:plain "admin"}}}}
+  {:admin {:admin true,                                       ; smeagol users
+           :email "admin@localhost",
+           :password "admin" {:plain "admin"}}}}

@@ -20,6 +20,7 @@
     [schema-tools.core :refer [open-schema]]
     [clj-http.client :as http]
     [clojure.string :as string]
+    [dda.pallet.commons.secret :as secret]
     [dda.pallet.dda-serverspec-crate.infra :as serverspec-infra]))
 
 (def ReleaseAsset
@@ -28,7 +29,7 @@
 (def SmeagolPasswdUser
   {:admin s/Bool
    :email s/Str
-   :password s/Str}) ;; Why not keep passwords secret?!
+   :password secret/Secret})
 
 (def SmeagolPasswd
   {s/Keyword SmeagolPasswdUser})
