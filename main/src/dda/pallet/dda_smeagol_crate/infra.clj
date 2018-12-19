@@ -28,13 +28,13 @@
 (def SmeagolInfra schema/SmeagolInfra)
 
 (s/defmethod core-infra/dda-init facility
-  [core-infra config]
-  (js/init-system facility))
+  [core-infra config])
+  ;(js/init-system facility))
 
 (s/defmethod core-infra/dda-install facility
   [core-infra config]
   (clj/install-system facility)
-  (js/install-system facility)
+  ;(js/install-system facility)
   (smeagol/install-smeagol config))
 
 
