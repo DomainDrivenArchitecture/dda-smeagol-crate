@@ -20,8 +20,18 @@
     [schema-tools.core :refer [open-schema]]
     [clj-http.client :as http]
     [clojure.string :as string]
-    [dda.pallet.dda-serverspec-crate.infra :as serverspec-infra]
-    [dda.pallet.dda-smeagol-crate.domain.schema :as schema]))
+    [dda.pallet.dda-serverspec-crate.infra :as serverspec-infra]))
+
+(def ReleaseAsset
+  (open-schema {:browser_download_url s/Str :name s/Str :content_type s/Str :label (s/maybe s/Str)}))
+
+(def SmeagolPasswdUser
+  {:admin s/Bool
+   :email s/Str
+   :password s/Str}) ;; Why not keep passwords secret?!
+
+(def SmeagolPasswd
+  {s/Keyword SmeagolPasswdUser})
 
 (defn- path-join [& paths]
   (-> (string/join "/" (vec paths))
@@ -40,12 +50,8 @@
    ;; TODO unify with httpd
    :port {:env "PORT" :value "8080"}})
 
-(def SmeagolPasswd schema/SmeagolPasswd)
 
 (def smeagol-releases "https://api.github.com/repos/DomainDrivenArchitecture/smeagol/releases")
-
-(def ReleaseAsset
-  (open-schema {:browser_download_url s/Str :name s/Str :content_type s/Str :label (s/maybe s/Str)}))
 
 ;; TODO maybe search by label? can travis specify content-type?
 (s/defn jar-asset?
