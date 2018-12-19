@@ -26,7 +26,7 @@
 (def SmeagolPasswd
   {s/Keyword SmeagolPasswdUser})
 
-(def SmeagolUberjar {:path s/Str :url s/Str :size s/Int})
+(def SmeagolUberjar {:path s/Str :url s/Str :size s/Int}) ;TODO: Review jem 2018_12_19: lets use here a hash (sha256 / sha512) instead of size
 (def SmeagolEnv {:env s/Str :value s/Str})
 
 ; TODO: simplify smeagol-parent-dir and smeagol-dir to one directory
