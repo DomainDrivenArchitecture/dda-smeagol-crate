@@ -92,7 +92,11 @@
                          ;; (logging/info (pr-str {:actual actual :expected uberjar}))
     ;                     (not (and fact-exist? (= fact-size-in-bytes size)))
        (actions/packages :aptitude ["curl"])
-       (actions/remote-file path
+       (actions/directory "/usr/local/lib/smeagol"
+                          :owner owner
+                          :group "users"
+                          :mode "755")
+       (actions/remote-file "/usr/local/lib/smeagol/smeagol-standalone.jar"
                             :url url
                             :owner owner)))
 
