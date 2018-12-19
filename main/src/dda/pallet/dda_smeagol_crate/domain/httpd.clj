@@ -27,7 +27,8 @@
    proxy-port :- s/Str]
   {:single-proxy
    {:domain-name server-fqdn
-    :proxy-target-port proxy-port}})
+    :proxy-target-port proxy-port
+    :settings #{:test}}})  ; TODO: make this configurable through domain config
 
 (s/defn
   infra-configuration
