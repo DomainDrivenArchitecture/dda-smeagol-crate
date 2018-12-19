@@ -60,8 +60,8 @@
        first
        :assets
        (filter jar-asset?)
-       first
-       ))
+       first))
+
 
 (s/defn uberjar-infra
   [smeagol-parent-dir :- s/Str
