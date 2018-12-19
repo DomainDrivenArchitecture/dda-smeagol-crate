@@ -85,7 +85,7 @@
         smeagol-parent-dir (path-join "/home" smeagol-owner)
         uberjar-config {:path "/home/smeagol/repo/dda"
                         :url "https://github.com/DomainDrivenArchitecture/smeagol/releases/download/1.0.2-snap1/smeagol-1.0.2-SNAPSHOT-standalone.jar"
-                        :sizer 0}]
+                        :size 0}]
 
         ;{:keys [path] :as uberjar-config} (uberjar-infra smeagol-parent-dir (uberjar-release-asset))]
     {facility
