@@ -82,9 +82,12 @@
   [facility :- s/Keyword
    passwd :- schema/SmeagolPasswd]
   (let [smeagol-owner "smeagol"
-        ;; TODO user-crate infra result?!
         smeagol-parent-dir (path-join "/home" smeagol-owner)
-        {:keys [path] :as uberjar-config} (uberjar-infra smeagol-parent-dir (uberjar-release-asset))]
+        uberjar-config {:path "/home/smeagol/repo/dda"
+                        :url "https://github.com/DomainDrivenArchitecture/smeagol/releases/download/1.0.2-snap1/smeagol-1.0.2-SNAPSHOT-standalone.jar"
+                        :sizer 0}]
+
+        ;{:keys [path] :as uberjar-config} (uberjar-infra smeagol-parent-dir (uberjar-release-asset))]
     {facility
      {:passwd passwd
       :owner smeagol-owner
