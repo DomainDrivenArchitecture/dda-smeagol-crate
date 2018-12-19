@@ -91,6 +91,7 @@
     ;                         (fact-path (:out @file-fact))
                          ;; (logging/info (pr-str {:actual actual :expected uberjar}))
     ;                     (not (and fact-exist? (= fact-size-in-bytes size)))
+       (actions/packages :aptitude ["curl"])
        (actions/remote-file path
                             :url url
                             :owner owner)))
