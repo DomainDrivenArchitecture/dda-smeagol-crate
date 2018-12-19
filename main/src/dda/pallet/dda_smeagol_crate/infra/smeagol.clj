@@ -60,7 +60,7 @@
                {:content-dir (:value content-dir)
                 :passwd-path (:value passwd)}))))
 
-(s/defn create-passwd
+(s/defn configure-smeagol-users
   [env :- SmeagolEnv
    owner :- s/Str
    passwd :- SmeagolPasswd]
@@ -129,8 +129,13 @@
   [config :- SmeagolInfra]
   (let [{:keys [uberjar passwd owner env]} config]
     ;; TODO shared :owner like `with-action-options`?!
-    (create-smeagol-config config)
-    (create-passwd (:passwd env) owner passwd)
     (download-uberjar owner uberjar)
     (initd-script env uberjar)
     (smeagol-service (vals env) uberjar)))
+
+(s/defn configure-smeagol
+  [config :- SmeagolInfra]
+  (let [{:keys [uberjar passwd owner env]} config]
+    ;; TODO shared :owner like `with-action-options`?!
+    (create-smeagol-config config)
+    (configure-smeagol-users (:passwd env) owner passwd)))

@@ -38,7 +38,8 @@
 
 
 (s/defmethod core-infra/dda-configure facility
-  [core-infra config])
+  [core-infra config]
+  (smeagol/configure-smeagol config))
 
 (s/defmethod core-infra/dda-test facility
   [core-infra config])
