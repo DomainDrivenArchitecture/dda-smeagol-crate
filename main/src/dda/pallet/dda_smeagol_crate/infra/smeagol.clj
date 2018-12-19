@@ -25,11 +25,28 @@
     [selmer.parser :as selmer]
     [pallet.actions :as actions]
     [clojure.tools.logging :as logging]
-    [dda.pallet.dda-serverspec-crate.infra :as fact]
-    [dda.pallet.dda-smeagol-crate.infra.schema :as schema]))
+    [dda.pallet.dda-serverspec-crate.infra :as fact]))
+
+(def SmeagolPasswdUser
+  {:admin s/Bool
+   :email s/Str
+   :password s/Str})
+
+(def SmeagolPasswd
+  {s/Keyword SmeagolPasswdUser})
+
+(def SmeagolUberjar {:path s/Str :url s/Str :size s/Int}) ;TODO: Review jem 2018_12_19: lets use here a hash (sha256 / sha512) instead of size
+(def SmeagolEnv {:env s/Str :value s/Str})
+
+; TODO: simplify smeagol-parent-dir and smeagol-dir to one directory
+(def SmeagolInfra
+  {:passwd SmeagolPasswd
+   :owner s/Str
+   :uberjar SmeagolUberjar
+   :env {s/Keyword SmeagolEnv}})
 
 (s/defn create-smeagol-config
-  [config :- schema/SmeagolInfra]
+  [config :- SmeagolInfra]
   (let [{:keys [env owner passwd]} config
         {:keys [config-edn passwd content-dir]} env
         config-edn-path (:value config-edn)]
@@ -44,9 +61,9 @@
                 :passwd-path (:value passwd)}))))
 
 (s/defn create-passwd
-  [env :- schema/SmeagolEnv
+  [env :- SmeagolEnv
    owner :- s/Str
-   passwd :- schema/SmeagolPasswd]
+   passwd :- SmeagolPasswd]
   (actions/remote-file
    (:value env)
    :literal true
@@ -63,7 +80,7 @@
 
 (s/defn download-uberjar
   [owner :- s/Str
-   uberjar :- schema/SmeagolUberjar]
+   uberjar :- SmeagolUberjar]
   (let [{:keys [path url size]} uberjar
         all-facts (crate/get-settings
                    fact/fact-facility
@@ -79,13 +96,13 @@
                             :owner owner)))
 
 (s/defn ->env-str
-  [envs :- [schema/SmeagolEnv]]
+  [envs :- [SmeagolEnv]]
   (string/join " "
                (map #(str (:env %) "=" (:value %)) envs)))
 
 (s/defn initd-script
-  [env :- {s/Keyword schema/SmeagolEnv}
-   uberjar :- schema/SmeagolUberjar]
+  [env :- {s/Keyword SmeagolEnv}
+   uberjar :- SmeagolUberjar]
   (let [env-str (-> env vals ->env-str)
         jar-path (:path uberjar)]
     (actions/remote-file
@@ -109,7 +126,7 @@
 
 ;; TODO ugly imperative style
 (s/defn install-smeagol
-  [config :- schema/SmeagolInfra]
+  [config :- SmeagolInfra]
   (let [{:keys [uberjar passwd owner env]} config]
     ;; TODO shared :owner like `with-action-options`?!
     (create-smeagol-config config)
