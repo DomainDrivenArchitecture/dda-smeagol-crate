@@ -24,14 +24,12 @@
     [dda.pallet.dda-smeagol-crate.infra :as infra]))
 
 (def SmeagolDomain
-  {(s/optional-key :smeagol-passwd) smeagol/SmeagolPasswd ;; reference from top level package is forbidden! moved to top-level
-                                                          ;; not optional - passwords should be allways defined  ...
-                                                          ;; smeagol-users is maybe a better name?
-   :server-fqdn s/Str
+  {:server-fqdn s/Str
    :user-passwd user/ClearPassword
    :user-ssh user/Ssh
    :git-credential git/GitCredential
-   :git-content-repo git/Repository})
+   :git-content-repo git/Repository
+   :smeagol-users smeagol/SmeagolPasswd}) ;; reference from top level package is forbidden! moved to top-level
 
 (def SmeagolDomainResolved (secret/create-resolved-schema SmeagolDomain))
 
@@ -60,5 +58,5 @@
   [domain-config :- SmeagolDomainResolved]
   (let [{:keys [git-credential git-content-repo server-fqdn
                 user-passwd user-ssh
-                smeagol-passwd]} domain-config]
-    (smeagol/smeagol-infra-configuration infra/facility smeagol-passwd)))
+                smeagol-users]} domain-config]
+    (smeagol/smeagol-infra-configuration infra/facility smeagol-users)))
