@@ -35,7 +35,7 @@
 (def SmeagolPasswd
   {s/Keyword SmeagolPasswdUser})
 
-(def SmeagolUberjar {:path s/Str :url s/Str :size s/Int}) ;TODO: Review jem 2018_12_19: lets use here a hash (sha256 / sha512) instead of size
+(def SmeagolUberjar {:path s/Str :url s/Str :md5-url s/Str})
 (def SmeagolEnv {:env s/Str :value s/Str})
 
 ; TODO: simplify smeagol-parent-dir and smeagol-dir to one directory
@@ -81,7 +81,7 @@
 (s/defn download-uberjar
   [owner :- s/Str
    uberjar :- SmeagolUberjar]
-  (let [{:keys [path url size]} uberjar
+  (let [{:keys [path url md5-url]} uberjar
         all-facts (crate/get-settings
                    fact/fact-facility
                    {:instance-id (crate/target-node)})
@@ -96,8 +96,9 @@
                           :owner owner
                           :group "users"
                           :mode "755")
-       (actions/remote-file "/usr/local/lib/smeagol/smeagol-standalone.jar"
+       (actions/remote-file "/usr/local/lib/smeagol/smeagol-1.0.2-SNAPSHOT-standalone.jar"
                             :url url
+                            :md5-url md5-url
                             :owner owner)))
 
 (s/defn ->env-str
