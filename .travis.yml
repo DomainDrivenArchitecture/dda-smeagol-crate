@@ -20,6 +20,11 @@ jobs:
         - lein test
         - lein uberjar
         - md5sum target/dda-smeagol-standalone.jar > target/dda-smeagol-standalone.jar.md5
+        - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+        - docker build -t dda-smeagol-crate --file integration/docker/image/Dockerfile .
+        - docker images
+        - docker tag dda-smeagol-crate domaindrivenarchitecture/dda-smeagol-crate:SNAPSHOT
+        - docker push $DOCKER_USERNAME/dda-smeagol-crate
       deploy:
         skip_cleanup: true
         provider: releases
@@ -32,11 +37,11 @@ jobs:
           - target/dda-smeagol-standalone.jar.md5
     - stage: docker-image
       script:
-        - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-        - docker build -t dda-smeagol-crate --file integration/docker/image/Dockerfile .
-        - docker images
-        - docker tag dda-smeagol-crate domaindrivenarchitecture/dda-smeagol-crate:SNAPSHOT
-        - docker push $DOCKER_USERNAME/dda-smeagol-crate
+        - #docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+        - #docker build -t dda-smeagol-crate --file integration/docker/image/Dockerfile .
+        - #docker images
+        - #docker tag dda-smeagol-crate domaindrivenarchitecture/dda-smeagol-crate:SNAPSHOT
+        - #docker push $DOCKER_USERNAME/dda-smeagol-crate
     - stage: docker-test
       script:
         - docker build -t dda-smeagol-crate-test --file integration/docker/test/Dockerfile .
