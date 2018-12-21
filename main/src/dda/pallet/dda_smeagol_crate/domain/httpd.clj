@@ -19,10 +19,8 @@
     [schema.core :as s]
     [dda.pallet.dda-httpd-crate.domain :as httpd-domain]))
 
-(def HttpdDomainConfig httpd-domain/HttpdDomainConfig)
-
 (s/defn
-  domain-configuration :- HttpdDomainConfig
+  domain-configuration :- httpd-domain/HttpdDomainConfig
   [server-fqdn :- s/Str
    proxy-port :- s/Str]
   {:single-proxy
