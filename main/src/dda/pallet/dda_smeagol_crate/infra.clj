@@ -18,7 +18,6 @@
   (:require
     [schema.core :as s]
     [dda.pallet.core.infra :as core-infra]
-    [dda.pallet.dda-smeagol-crate.infra.java-script :as js]
     [dda.pallet.dda-smeagol-crate.infra.clojure :as clj]
     [dda.pallet.dda-smeagol-crate.infra.smeagol :as smeagol]))
 
@@ -28,14 +27,11 @@
 
 (s/defmethod core-infra/dda-init facility
   [core-infra config])
-  ;(js/init-system facility))
 
 (s/defmethod core-infra/dda-install facility
   [core-infra config]
   (clj/install-system facility)
-  ;(js/install-system facility)
   (smeagol/install-smeagol config))
-
 
 (s/defmethod core-infra/dda-configure facility
   [core-infra config]
