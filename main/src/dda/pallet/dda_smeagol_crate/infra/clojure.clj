@@ -27,19 +27,6 @@
     (logging/info (str facility "-install system: openjdk-8")))
   (actions/packages :aptitude ["openjdk-8-jdk"]))
 
-(defn install-leiningen
-  [facility]
-  (actions/as-action
-    (logging/info (str facility "-install system: leiningen")))
-  "get and install lein at /bin/"
-  (actions/remote-file
-    "/bin/lein"
-    :owner "root"
-    :group "users"
-    :mode "755"
-    :url "https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein"))
-
 (s/defn install-system
   [facility :- s/Keyword]
-  (install-java-8 facility)
-  (install-leiningen facility))
+  (install-java-8 facility))
