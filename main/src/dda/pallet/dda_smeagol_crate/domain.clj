@@ -29,7 +29,8 @@
    :user-ssh user/Ssh
    :git-credential git/GitCredential
    :git-content-repo git/Repository
-   :smeagol-users smeagol/SmeagolPasswd}) ;; reference from top level package is forbidden! moved to top-level
+   :smeagol-users smeagol/SmeagolPasswd
+   (s/optional-key :settings) httpd/VhostSettings})
 
 (def SmeagolDomainResolved (secret/create-resolved-schema SmeagolDomain))
 
@@ -50,8 +51,8 @@
 (s/defn ^:always-validate
   httpd-domain-configuration
   [domain-config :- SmeagolDomainResolved]
-  (let [{:keys [server-fqdn proxy-port] :or {proxy-port "8080"}} domain-config]
-    (httpd/domain-configuration server-fqdn proxy-port)))
+  (let [{:keys [server-fqdn proxy-port settings] :or {proxy-port "8080"}} domain-config]
+    (httpd/domain-configuration server-fqdn proxy-port (contains? domain-config :settings) settings)))
 
 (s/defn ^:always-validate
   infra-configuration

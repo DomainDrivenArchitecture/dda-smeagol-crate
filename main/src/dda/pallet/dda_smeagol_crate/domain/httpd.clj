@@ -19,14 +19,20 @@
     [schema.core :as s]
     [dda.pallet.dda-httpd-crate.domain :as httpd-domain]))
 
+(def VhostSettings httpd-domain/VhostSettings)
+
 (s/defn
   domain-configuration :- httpd-domain/HttpdDomainConfig
   [server-fqdn :- s/Str
-   proxy-port :- s/Str]
+   proxy-port :- s/Str
+   settings-contained? :- s/Bool
+   settings :- VhostSettings]
   {:single-proxy
-   {:domain-name server-fqdn
-    :proxy-target-port proxy-port
-    :settings #{:test}}})  ; TODO: make this configurable through domain config
+   (merge
+     {:domain-name server-fqdn
+      :proxy-target-port proxy-port}
+     (when settings-contained?
+       {:settings settings}))})
 
 (s/defn
   infra-configuration
