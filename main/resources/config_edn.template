@@ -1,8 +1,8 @@
 {
   :site-title           "DomainDrivenArchitecture"
   :default-locale       "en-GB"
-  :content-dir          {{content-dir}}
-  :passwd               {{passwd-path}}
+  :content-dir          "{{content-dir}}"
+  :passwd               "{{passwd-path}}"
   :log-level            :info
   :formatters           {"vega"         smeagol.formatting/process-vega
                          "vis"          smeagol.formatting/process-vega
