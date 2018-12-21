@@ -1,4 +1,4 @@
-FROM domaindrivenarchitecture/dda-smeagol-crate:SNAPSHOT
+FROM dda-smeagol-crate
 
 RUN apt-get install curl -y
 
