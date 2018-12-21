@@ -35,7 +35,7 @@
                             :protocol :https
                             :user-name "smeagol"}]
               :repo {}
-              :synced-repo {:smeagol [{:host "github.com"
+              :synced-repo {:content [{:host "github.com"
                                        :repo-name "a-private-repo"
                                        :protocol :https
                                        :server-type :github}]}}}})

@@ -57,7 +57,8 @@
 (s/defn ^:always-validate
   infra-configuration
   [domain-config :- SmeagolDomainResolved]
-  (let [{:keys [git-credential git-content-repo server-fqdn
-                user-passwd user-ssh
+  (let [{:keys [git-content-repo server-fqdn
                 smeagol-users]} domain-config]
-    (smeagol/smeagol-infra-configuration infra/facility smeagol-users)))
+    (smeagol/smeagol-infra-configuration
+      infra/facility (:repo-name git-content-repo)
+      smeagol-users)))

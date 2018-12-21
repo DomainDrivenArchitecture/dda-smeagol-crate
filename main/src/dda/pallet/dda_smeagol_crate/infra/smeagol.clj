@@ -96,7 +96,7 @@
                           :owner owner
                           :group "users"
                           :mode "755")
-       (actions/remote-file "/usr/local/lib/smeagol/smeagol-1.0.2-SNAPSHOT-standalone.jar"
+       (actions/remote-file path
                             :url url
                             :md5-url md5-url
                             :owner owner)))

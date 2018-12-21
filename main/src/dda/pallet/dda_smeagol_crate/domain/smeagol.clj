@@ -40,10 +40,10 @@
 
 (s/defn environment
   [root :- s/Str]
-  {:passwd {:env "SMEAGOL_PASSWD" :value (path-join root "passwd")}
+  {:passwd {:env "SMEAGOL_PASSWD" :value (path-join root "passwd.edn")}
    :config-edn {:env "SMEAGOL_CONFIG" :value (path-join root "config.edn")}
    ;; TODO git-crate infra result?!
-   :content-dir {:env "SMEAGOL_CONTENT_DIR" :value (path-join root "repo" "smeagol" "dda")}
+   :content-dir {:env "SMEAGOL_CONTENT_DIR" :value (path-join root "repo" "content" "dda")}
    :fonts {:env "TIMBRE_DEFAULT_STACKTRACE_FONTS" :value "{}"}
    :log-level {:env "TIMBRE_LEVEL" :value ":info"}
    :site-title {:env "SMEAGOL_SITE_TITLE" :value "DomainDrivenArchitecture"}
@@ -80,10 +80,11 @@
 
 (s/defn smeagol-infra-configuration
   [facility :- s/Keyword
+   repo-name :- s/Str
    passwd :- SmeagolPasswd]
   (let [smeagol-owner "smeagol"
         smeagol-parent-dir (path-join "/home" smeagol-owner)
-        uberjar-config {:path "/home/smeagol/repo/dda"
+        uberjar-config {:path "/usr/local/lib/smeagol/smeagol-1.0.2-SNAPSHOT-standalone.jar"
                         :url "https://github.com/DomainDrivenArchitecture/smeagol/releases/download/1.0.2-snap1/smeagol-1.0.2-SNAPSHOT-standalone.jar"
                         :md5-url "https://github.com/DomainDrivenArchitecture/smeagol/releases/download/1.0.2-snap1/smeagol-1.0.2-SNAPSHOT-standalone.jar.md5"}]
 
