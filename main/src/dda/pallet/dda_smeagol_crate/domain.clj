@@ -51,8 +51,8 @@
 (s/defn ^:always-validate
   httpd-domain-configuration
   [domain-config :- SmeagolDomainResolved]
-  (let [{:keys [server-fqdn proxy-port settings] :or {proxy-port "8080"}} domain-config]
-    (httpd/domain-configuration server-fqdn proxy-port (contains? domain-config :settings) settings)))
+  (let [{:keys [server-fqdn proxy-port settings] :or {proxy-port "8080" settings #{}}} domain-config]
+    (httpd/domain-configuration server-fqdn proxy-port settings)))
 
 (s/defn ^:always-validate
   infra-configuration
