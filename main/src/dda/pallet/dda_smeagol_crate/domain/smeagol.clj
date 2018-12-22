@@ -34,6 +34,9 @@
 (def SmeagolPasswd
   {s/Keyword SmeagolPasswdUser})
 
+(def SmeagolPasswdResolved
+  (secret/create-resolved-schema SmeagolPasswd))
+
 (defn- path-join [& paths]
   (-> (string/join "/" (vec paths))
       (string/replace ,  #"[\\/]+" "/")))
@@ -81,7 +84,7 @@
 (s/defn smeagol-infra-configuration
   [facility :- s/Keyword
    repo-name :- s/Str
-   passwd :- SmeagolPasswd]
+   passwd :- SmeagolPasswdResolved]
   (let [smeagol-owner "smeagol"
         smeagol-parent-dir (path-join "/home" smeagol-owner)
         uberjar-config {:path "/usr/local/lib/smeagol/smeagol-1.0.2-SNAPSHOT-standalone.jar"
