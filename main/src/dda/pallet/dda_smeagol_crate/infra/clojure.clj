@@ -21,6 +21,8 @@
     [pallet.actions :as actions]
     [dda.pallet.crate.util :as util]))
 
+;; TODO: Name of this ns is missleading ... anb maybe a separat ns is no longer used?
+
 (defn install-java-8
   [facility]
   (actions/as-action

@@ -18,6 +18,7 @@
   (:require
     [schema.core :as s]
     [dda.pallet.dda-git-crate.domain :as git-domain]
+    ;; TODO: expose used fn on git-domain level as only git-domain serves as public api
     [dda.pallet.dda-git-crate.domain.repo :as git-domain.repo]))
 
 (def Repository git-domain/Repository)
@@ -36,6 +37,7 @@
    git-credential :- GitCredentialResolved
    git-content-repo :- Repository]
   {:smeagol
+   ;; TODO: if users name is configurable hardcoded email is wrong - isn't it?
    {:user-email (str "smeagol@" domain)
     :credential [git-credential]
     :repo {}

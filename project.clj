@@ -9,6 +9,7 @@
                  [dda/dda-user-crate "1.0.6"]
                  [clj-http "3.9.1"]
                  [cheshire "5.8.1"]]
+  ;; TODO: fair idea - but what's the benefit? This would be the only project with "target/uberjar/*" layout. Leaving our convention here needs a reason.
   :target-path "target/%s/"
   :source-paths ["main/src"]
   :resource-paths ["main/resources"]

@@ -54,6 +54,7 @@
      :literal true
      :owner owner
      :mode "755"
+     ;; TODO: wwhy do we use selmer here instead of writing edn directly?
      :content (selmer/render-file
                "config_edn.template"
                {:content-dir content-dir
@@ -68,8 +69,10 @@
    :literal true
    :owner owner
    :mode "755"
+   ;; TODO: can we remove passwd_edn.template ?
    :content passwd))
 
+;; TODO: this function is no longer used - remove ?
 (s/defn path-to-keyword :- s/Keyword
   [path :- s/Str]
   (keyword (string/replace path #"[/]" "_")))
@@ -130,5 +133,6 @@
   [config :- SmeagolInfra]
   (let [{:keys [uberjar passwd owner configs]} config]
     (create-smeagol-config config)
+    ;; TODO: Here we demand a key :passwd in configs but we've neither documentation nor validation ... thats a "runtime-suprise" gift ;-)
     (configure-smeagol-users (:passwd configs) owner passwd)
     (restart-smeagol-service)))

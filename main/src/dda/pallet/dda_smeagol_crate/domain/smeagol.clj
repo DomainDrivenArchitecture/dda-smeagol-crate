@@ -50,6 +50,7 @@
    content-dir :- s/Str
    passwd :- SmeagolPasswdResolved
    port :- s/Num]
+  ;;TODO: If we've configurable user, hardcoded owner will not be a good idea ...
   (let [smeagol-owner "smeagol"
         smeagol-parent-dir (path-join "/home" smeagol-owner)
         uberjar-config {:path "/usr/local/lib/smeagol/smeagol-1.0.2-SNAPSHOT-standalone.jar"
