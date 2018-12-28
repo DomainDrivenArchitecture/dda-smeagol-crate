@@ -9,6 +9,7 @@
                  [dda/dda-user-crate "1.0.6-SNAPSHOT"]
                  [clj-http "3.9.1"]
                  [cheshire "5.8.1"]]
+  :target-path "target/%s/"
   :source-paths ["main/src"]
   :resource-paths ["main/resources"]
   :repositories [["snapshots" :clojars]
