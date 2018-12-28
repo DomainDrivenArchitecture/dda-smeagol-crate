@@ -1,6 +1,6 @@
-FROM domaindrivenarchitecture/dda-smeagol-crate:SNAPSHOT
+FROM dda-smeagol-crate
 
-RUN apt-get install curl -y
+RUN apt-get install curl -y -qq
 
 RUN curl -L -o /app/serverspec.jar https://github.com/DomainDrivenArchitecture/dda-serverspec-crate/releases/download/1.2.2/dda-serverspec-crate-1.2.2-standalone.jar
 

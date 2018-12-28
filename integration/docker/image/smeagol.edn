@@ -11,4 +11,5 @@
                     :protocol :https
                     :server-type :github}
  :server-fqdn "a.server.name"
- :smeagol-passwd {:admin {:admin true, :email "admin@localhost", :password "admin"}}}
+ :settings #{:test}
+ :smeagol-users {:admin {:admin true, :email "admin@localhost", :password {:plain "admin"}}}}

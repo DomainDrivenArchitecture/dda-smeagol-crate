@@ -20,29 +20,21 @@
     [dda.pallet.dda-smeagol-crate.domain.smeagol :as smeagol]
     [dda.pallet.dda-smeagol-crate.domain.git :as git]
     [dda.pallet.dda-smeagol-crate.domain.user :as user]
+    [dda.pallet.dda-smeagol-crate.domain.httpd :as httpd]
     [dda.pallet.dda-smeagol-crate.infra :as infra]))
 
 (def SmeagolDomain
-  {(s/optional-key :tomcat-xmx-megabyte) s/Num ;; necessary on level of domain?
-   (s/optional-key :smeagol-passwd) smeagol/SmeagolPasswd ;; reference from top level package is forbidden! moved to top-level
-                                                          ;; not optional - passwords should be allways defined  ...
-                                                          ;; smeagol-users is maybe a better name?
-   :server-fqdn s/Str
+  {:server-fqdn s/Str
    :user-passwd user/ClearPassword
    :user-ssh user/Ssh
    :git-credential git/GitCredential
-   :git-content-repo git/Repository})
+   :git-content-repo git/Repository
+   :smeagol-users smeagol/SmeagolPasswd
+   (s/optional-key :settings) httpd/VhostSettings})
 
 (def SmeagolDomainResolved (secret/create-resolved-schema SmeagolDomain))
 
 (def InfraResult {infra/facility infra/SmeagolInfra})
-
-(s/defn ^:always-validate
-  tomcat-domain-configuration
-  [domain-config :- SmeagolDomainResolved]
-  (let [{:keys [tomcat-xmx-megabyte smeagol-passwd]
-         :or {tomcat-xmx-megabyte 2560}} domain-config]
-    (smeagol/tomcat-domain-configuration tomcat-xmx-megabyte)))
 
 (s/defn ^:always-validate
   user-domain-configuration
@@ -56,11 +48,17 @@
   (let [{:keys [git-credential git-content-repo server-fqdn]} domain-config]
     (git/domain-configuration server-fqdn git-credential git-content-repo)))
 
+(s/defn ^:always-validate
+  httpd-domain-configuration
+  [domain-config :- SmeagolDomainResolved]
+  (let [{:keys [server-fqdn proxy-port settings] :or {proxy-port "8080" settings #{}}} domain-config]
+    (httpd/domain-configuration server-fqdn proxy-port settings)))
 
 (s/defn ^:always-validate
   infra-configuration
   [domain-config :- SmeagolDomainResolved]
-  (let [{:keys [git-credential git-content-repo server-fqdn
-                user-passwd user-ssh
-                smeagol-passwd]} domain-config]
-    (smeagol/smeagol-infra-configuration infra/facility smeagol-passwd)))
+  (let [{:keys [git-content-repo server-fqdn
+                smeagol-users]} domain-config]
+    (smeagol/smeagol-infra-configuration
+      infra/facility (:repo-name git-content-repo)
+      smeagol-users)))

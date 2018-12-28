@@ -24,7 +24,8 @@
     [dda.pallet.dda-serverspec-crate.app :as serverspec]
     [dda.pallet.dda-user-crate.app :as user]
     [dda.pallet.dda-git-crate.app :as git]
-    [dda.pallet.dda-tomcat-crate.app :as tomcat]
+    [dda.pallet.dda-httpd-crate.app :as httpd]
+    [dda.pallet.dda-config-crate.infra :as config-crate]
     [dda.pallet.dda-smeagol-crate.infra :as infra]
     [dda.pallet.dda-smeagol-crate.domain :as domain]))
 
@@ -40,7 +41,7 @@
    {s/Keyword (merge
                 user/InfraResult
                 git/InfraResult
-                ;tomcat/InfraResult
+                httpd/InfraResult
                 InfraResult)}})
 
 (s/defn ^:always-validate
@@ -53,12 +54,14 @@
         (domain/user-domain-configuration resolved-domain-config) :group-key group-key)
       (git/app-configuration-resolved
         (domain/git-domain-configuration resolved-domain-config) :group-key group-key)
+      (httpd/single-proxy-app-configuration
+       (domain/httpd-domain-configuration resolved-domain-config) :group-key group-key)
       {:group-specific-config
        {group-key
         (domain/infra-configuration resolved-domain-config)}})))
 
 (s/defn ^:always-validate
-  app-configuration ; TODO: Reactivate as soon as tomcat has been moved out :- SmeagolAppConfig
+  app-configuration :- SmeagolAppConfig
   [domain-config :- SmeagolDomain
    & options]
   (let [resolved-domain-config (secret/resolve-secrets domain-config SmeagolDomain)]
@@ -73,9 +76,9 @@
       app-config [(config-crate/with-config app-config)
                   serverspec/with-serverspec
                   user/with-user
-                  git/with-git])))
-                  ;tomcat/with-tomcat
-                  ;with-smeagol])))
+                  git/with-git
+                  httpd/with-httpd
+                  with-smeagol])))
 
 (def crate-app (core-app/make-dda-crate-app
                  :facility infra/facility

@@ -20,7 +20,7 @@
    [dda.pallet.dda-smeagol-crate.domain.smeagol :as sut]))
 
 (def passwd
-  {:admin {:admin true, :email "admin@localhost", :password "admin"}})
+  {:admin {:admin true, :email "admin@localhost", :password {:plain "admin"}}})
 
 (deftest test-schema
   (testing "test the smeagol schema"

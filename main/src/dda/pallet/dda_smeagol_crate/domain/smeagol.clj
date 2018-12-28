@@ -17,43 +17,86 @@
 (ns dda.pallet.dda-smeagol-crate.domain.smeagol
   (:require
     [schema.core :as s]
-    [dda.pallet.dda-smeagol-crate.domain.schema :as schema]))
+    [schema-tools.core :refer [open-schema]]
+    [clj-http.client :as http]
+    [clojure.string :as string]
+    [dda.pallet.commons.secret :as secret]
+    [dda.pallet.dda-serverspec-crate.infra :as serverspec-infra]))
+
+(def ReleaseAsset
+  (open-schema {:browser_download_url s/Str :name s/Str :content_type s/Str :label (s/maybe s/Str)}))
+
+(def SmeagolPasswdUser
+  {:admin s/Bool
+   :email s/Str
+   :password secret/Secret})
+
+(def SmeagolPasswd
+  {s/Keyword SmeagolPasswdUser})
+
+(def SmeagolPasswdResolved
+  (secret/create-resolved-schema SmeagolPasswd))
+
+(defn- path-join [& paths]
+  (-> (string/join "/" (vec paths))
+      (string/replace ,  #"[\\/]+" "/")))
+
+(s/defn environment
+  [root :- s/Str]
+  {:passwd {:env "SMEAGOL_PASSWD" :value (path-join root "passwd.edn")}
+   :config-edn {:env "SMEAGOL_CONFIG" :value (path-join root "config.edn")}
+   ;; TODO git-crate infra result?!
+   :content-dir {:env "SMEAGOL_CONTENT_DIR" :value (path-join root "repo" "content" "dda")}
+   :fonts {:env "TIMBRE_DEFAULT_STACKTRACE_FONTS" :value "{}"}
+   :log-level {:env "TIMBRE_LEVEL" :value ":info"}
+   :site-title {:env "SMEAGOL_SITE_TITLE" :value "DomainDrivenArchitecture"}
+   :default-locale {:env "SMEAGOL_DEFAULT_LOCALE" :value "en-GB"}
+   ;; TODO unify with httpd
+   :port {:env "PORT" :value "8080"}})
 
 
-(defn- resource-location-helper
-  [smeagol-location]
-  {:war-location {:name "war-location" :source (str smeagol-location "target/smeagol.war") :destination "/var/lib/tomcat8/webapps/smeagol.war"}
-   :passwd {:name "passwd" :source (str smeagol-location "resources/passwd") :destination "/usr/local/etc/passwd"}
-   :config-edn {:name "config-edn" :source (str smeagol-location "resources/config.edn") :destination "/usr/local/etc/config.edn"}
-   :content-dir {:name "content-dir" :source (str smeagol-location "resources/public/content") :destination "/usr/local/etc/content"}})
+(def smeagol-releases "https://api.github.com/repos/DomainDrivenArchitecture/smeagol/releases")
 
-(def SmeagolPasswd schema/SmeagolPasswd)
+;; TODO maybe search by label? can travis specify content-type?
+(s/defn jar-asset?
+  [asset :- ReleaseAsset]
+  (-> asset :content_type (= "application/x-java-archive")))
 
-(def environment-variables
-  [{:name "SMEAGOL_CONFIG" :value "/usr/local/etc/config.edn"}
-   {:name "SMEAGOL_CONTENT_DIR" :value "/usr/local/etc/content"}
-   {:name "SMEAGOL_PASSWD" :value "/usr/local/etc/passwd"}
-   {:name "TIMBRE_DEFAULT_STACKTRACE_FONTS" :value "{}"}
-   {:name "TIMBRE_LEVEL" :value ":info"}
-   {:name "PORT" :value "80"}])
+(s/defn uberjar-release-asset ; :- ReleaseAsset
+  []
+  (->> (http/get smeagol-releases {:as :json})
+       :body
+       (filter #(some jar-asset? (:assets %)))
+       first
+       :assets
+       (filter jar-asset?)
+       first))
 
-;; Review jem 2018_12_03: why not move tomcat into own ns ? - or remove it ;-)
-(s/defn tomcat-domain-configuration
-  [tomcat-xmx-megabyte]
-  {:app-server
-   {:xmx-megabyte tomcat-xmx-megabyte}})            ; e.g. 6072 or 2560
+
+(s/defn uberjar-infra
+  [smeagol-parent-dir :- s/Str
+   release-asset :- ReleaseAsset]
+  (let [{:keys [name size browser_download_url]} release-asset]
+    {:path (path-join smeagol-parent-dir name)
+     :url browser_download_url
+     :size size}))
 
 (s/defn smeagol-infra-configuration
   [facility :- s/Keyword
-   smeagol-passwd :- schema/SmeagolPasswd]
-  (let [smeagol-parent-dir "/var/lib/"
-        smeagol-dir "smeagol-master/"
-        smeagol-owner "tomcat8"]
+   repo-name :- s/Str
+   passwd :- SmeagolPasswdResolved]
+  (let [smeagol-owner "smeagol"
+        smeagol-parent-dir (path-join "/home" smeagol-owner)
+        uberjar-config {:path "/usr/local/lib/smeagol/smeagol-1.0.2-SNAPSHOT-standalone.jar"
+                        :url "https://github.com/DomainDrivenArchitecture/smeagol/releases/download/1.0.2-snap1/smeagol-1.0.2-SNAPSHOT-standalone.jar"
+                        :md5-url "https://github.com/DomainDrivenArchitecture/smeagol/releases/download/1.0.2-snap1/smeagol-1.0.2-SNAPSHOT-standalone.jar.md5"}]
+
+        ;{:keys [path] :as uberjar-config} (uberjar-infra smeagol-parent-dir (uberjar-release-asset))]
     {facility
-     {:smeagol-parent-dir smeagol-parent-dir
-      :smeagol-dir smeagol-dir
-      :smeagol-passwd smeagol-passwd
-      :smeagol-owner smeagol-owner
-      :repo-download-source "https://github.com/DomainDrivenArchitecture/smeagol/archive/master.zip"
-      :resource-locations (resource-location-helper (str smeagol-parent-dir smeagol-dir))
-      :environment-variables environment-variables}}))
+     {:passwd passwd
+      :owner smeagol-owner
+      :uberjar uberjar-config
+      :env (environment smeagol-parent-dir)}}))
+    ; TODO: make things as simple as possible - just download always
+    ;serverspec-infra/facility
+     ;{:file-fact {:uberjar {:path path}}}})) ;; TODO make use of `:uberjar` kw in infra/download-uberjar

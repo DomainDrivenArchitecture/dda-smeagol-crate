@@ -32,7 +32,7 @@
    {:user-email (str "smeagol@" domain)
     :credential [git-credential]
     :repo {}
-    :synced-repo {:smeagol [git-content-repo]}}})
+    :synced-repo {:content [git-content-repo]}}})
 
 (s/defn
   infra-configuration

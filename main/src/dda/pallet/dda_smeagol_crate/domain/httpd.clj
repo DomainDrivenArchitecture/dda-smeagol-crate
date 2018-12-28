@@ -14,17 +14,26 @@
 ; See the License for the specific language governing permissions and
 ; limitations under the License.
 
-(ns dda.pallet.dda-smeagol-crate.domain.schema
+(ns dda.pallet.dda-smeagol-crate.domain.httpd
   (:require
-   [schema.core :as s]))
+    [schema.core :as s]
+    [dda.pallet.dda-httpd-crate.domain :as httpd-domain]))
 
-; TODO: Review jem 2018_12_03: Move schema do smeagol ns - like DomainDrivenDesign
-; Aggregate keep it local
+(def VhostSettings httpd-domain/VhostSettings)
 
-(def SmeagolPasswdUser
-  {:admin s/Bool
-   :email s/Str
-   :password s/Str}) ;; Why not keep passwords secret?!
+(s/defn
+  domain-configuration :- httpd-domain/HttpdDomainConfig
+  [server-fqdn :- s/Str
+   proxy-port :- s/Str
+   settings :- VhostSettings]
+  {:single-proxy
+   {:domain-name server-fqdn
+    :proxy-target-port proxy-port
+    :settings settings}})
 
-(def SmeagolPasswd
-  {s/Keyword SmeagolPasswdUser})
+(s/defn
+  infra-configuration
+  [server-fqdn :- s/Str
+   proxy-port :- s/Str]
+  (httpd-domain/single-proxy-configuration
+   (domain-configuration server-fqdn proxy-port)))
