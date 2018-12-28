@@ -18,6 +18,7 @@ jobs:
     - stage: build
       script:
         - # build
+        - lein eastwood
         - lein test
         - lein uberjar
         - md5sum target/dda-smeagol-standalone.jar > target/dda-smeagol-standalone.jar.md5

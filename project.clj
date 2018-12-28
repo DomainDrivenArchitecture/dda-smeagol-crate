@@ -27,7 +27,9 @@
                     [ch.qos.logback/logback-classic "1.3.0-alpha4"]
                     [org.slf4j/jcl-over-slf4j "1.8.0-beta2"]]
                    :plugins
-                   [[lein-sub "0.3.0"]]
+                   [[lein-sub "0.3.0"]
+                    [jonase/eastwood "0.3.4" :exclusions [org.clojure/clojure]]]
+                   :eastwood {:namespaces [:source-paths]}
                    :leiningen/reply
                    {:dependencies [[org.slf4j/jcl-over-slf4j "1.8.0-beta0"]]
                     :exclusions [commons-logging]}
