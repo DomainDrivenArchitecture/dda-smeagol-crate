@@ -27,10 +27,11 @@
 
 (s/defn
   domain-configuration :- user-domain/UserDomainConfigResolved
-  [user-password :- ClearPasswordResolved
+  [name :- s/Keyword
+   user-password :- ClearPasswordResolved
    ssh :- SshResolved]
   (let [{:keys [ssh-authorized-keys ssh-key]} ssh]
-    {:smeagol
+    {name
         (merge
           {:clear-password user-password
            :settings #{:bashrc-d}}

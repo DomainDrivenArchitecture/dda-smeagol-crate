@@ -1,8 +1,9 @@
-{:user-passwd {:plain "xxx"}                                  ; smeagol user pwd on os level
- :user-ssh
-  {:ssh-authorized-keys [{:plain "ssh-rsa AAAA..LL comment"}] ; ssh authorized keys
-   :ssh-key {:public-key {:plain "ssh-rsa AAAA..LL comment"}  ; ssh-key for git sync
-             :private-key {:plain "SOME_PRIVATE_SSH_KEY"}}}
+{:user {:name :smeagol
+        :passwd {:plain "xxx"}                                  ; smeagol user pwd on os level
+        :ssh
+        {:ssh-authorized-keys [{:plain "ssh-rsa AAAA..LL comment"}] ; ssh authorized keys
+         :ssh-key {:public-key {:plain "ssh-rsa AAAA..LL comment"}  ; ssh-key for git sync
+                   :private-key {:plain "SOME_PRIVATE_SSH_KEY"}}}}
  :git-credential
   {:host "github.com"                                         ; credentials for content repo
    :protocol :ssh

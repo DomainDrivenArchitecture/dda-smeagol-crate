@@ -9,6 +9,7 @@
                  [dda/dda-user-crate "1.0.6-SNAPSHOT"]
                  [clj-http "3.9.1"]
                  [cheshire "5.8.1"]]
+  :target-path "target/%s/"
   :source-paths ["main/src"]
   :resource-paths ["main/resources"]
   :repositories [["snapshots" :clojars]
@@ -27,7 +28,9 @@
                     [ch.qos.logback/logback-classic "1.3.0-alpha4"]
                     [org.slf4j/jcl-over-slf4j "1.8.0-beta2"]]
                    :plugins
-                   [[lein-sub "0.3.0"]]
+                   [[lein-sub "0.3.0"]
+                    [jonase/eastwood "0.3.4" :exclusions [org.clojure/clojure]]]
+                   :eastwood {:namespaces [:source-paths]}
                    :leiningen/reply
                    {:dependencies [[org.slf4j/jcl-over-slf4j "1.8.0-beta0"]]
                     :exclusions [commons-logging]}

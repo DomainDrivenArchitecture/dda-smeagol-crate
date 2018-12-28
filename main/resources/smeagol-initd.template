@@ -6,7 +6,7 @@ case $1 in
     start)
         echo "Starting $SERVICE_NAME ..."
         if [ ! -f $PID_PATH_NAME ]; then
-            {{env-str}} nohup java -jar {{jar-path}} /tmp 2>> /dev/null >> /dev/null &
+            PORT={{port}} SMEAGOL_CONFIG="{{config-edn}}" nohup sudo -u {{owner}} --preserve-env="PORT,SMEAGOL_CONFIG" java -jar {{jar-path}} 2>> /dev/null >> /dev/null &
             echo $! > $PID_PATH_NAME
             echo "$SERVICE_NAME started ..."
         else
@@ -32,7 +32,7 @@ case $1 in
             echo "$SERVICE_NAME stopped ...";
             rm $PID_PATH_NAME
             echo "$SERVICE_NAME starting ..."
-            {{env-str}} nohup java -jar {{jar-path}} 2>> /dev/null >> /dev/null &
+            PORT={{port}} SMEAGOL_CONFIG="{{config-edn}}" nohup sudo -u {{owner}} --preserve-env="PORT,SMEAGOL_CONFIG" java -jar {{jar-path}} 2>> /dev/null >> /dev/null &
             echo $! > $PID_PATH_NAME
             echo "$SERVICE_NAME started ..."
         else

@@ -25,8 +25,9 @@
 
 (def SmeagolDomain
   {:server-fqdn s/Str
-   :user-passwd user/ClearPassword
-   :user-ssh user/Ssh
+   :user {:name s/Keyword
+          :passwd user/ClearPassword
+          :ssh user/Ssh}
    :git-credential git/GitCredential
    :git-content-repo git/Repository
    :smeagol-users smeagol/SmeagolPasswd
@@ -39,8 +40,8 @@
 (s/defn ^:always-validate
   user-domain-configuration
   [domain-config :- SmeagolDomainResolved]
-  (let [{:keys [user-passwd user-ssh]} domain-config]
-    (user/domain-configuration user-passwd user-ssh)))
+  (let [{:keys [passwd ssh name]} (:user domain-config)]
+    (user/domain-configuration name passwd ssh)))
 
 (s/defn ^:always-validate
   git-domain-configuration
@@ -48,17 +49,23 @@
   (let [{:keys [git-credential git-content-repo server-fqdn]} domain-config]
     (git/domain-configuration server-fqdn git-credential git-content-repo)))
 
+(def default-service-port 8080)
+
 (s/defn ^:always-validate
   httpd-domain-configuration
   [domain-config :- SmeagolDomainResolved]
-  (let [{:keys [server-fqdn proxy-port settings] :or {proxy-port "8080" settings #{}}} domain-config]
+  (let [{:keys [server-fqdn proxy-port settings] :or {proxy-port (str default-service-port) settings #{}}} domain-config]
     (httpd/domain-configuration server-fqdn proxy-port settings)))
 
 (s/defn ^:always-validate
   infra-configuration
   [domain-config :- SmeagolDomainResolved]
-  (let [{:keys [git-content-repo server-fqdn
-                smeagol-users]} domain-config]
+  (let [{:keys [smeagol-users user git-content-repo]} domain-config
+        user-name (:name user)
+        content-dir (git/repo-directory-name user-name git-content-repo)]
     (smeagol/smeagol-infra-configuration
-      infra/facility (:repo-name git-content-repo)
-      smeagol-users)))
+     infra/facility
+     user-name
+     content-dir
+     smeagol-users
+     default-service-port)))

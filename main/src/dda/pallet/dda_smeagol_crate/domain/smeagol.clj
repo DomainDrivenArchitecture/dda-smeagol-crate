@@ -18,13 +18,11 @@
   (:require
     [schema.core :as s]
     [schema-tools.core :refer [open-schema]]
+    [pallet.script.lib :refer [config-root]]
     [clj-http.client :as http]
     [clojure.string :as string]
     [dda.pallet.commons.secret :as secret]
     [dda.pallet.dda-serverspec-crate.infra :as serverspec-infra]))
-
-(def ReleaseAsset
-  (open-schema {:browser_download_url s/Str :name s/Str :content_type s/Str :label (s/maybe s/Str)}))
 
 (def SmeagolPasswdUser
   {:admin s/Bool
@@ -41,62 +39,27 @@
   (-> (string/join "/" (vec paths))
       (string/replace ,  #"[\\/]+" "/")))
 
-(s/defn environment
+(s/defn config-locations
   [root :- s/Str]
-  {:passwd {:env "SMEAGOL_PASSWD" :value (path-join root "passwd.edn")}
-   :config-edn {:env "SMEAGOL_CONFIG" :value (path-join root "config.edn")}
-   ;; TODO git-crate infra result?!
-   :content-dir {:env "SMEAGOL_CONTENT_DIR" :value (path-join root "repo" "content" "dda")}
-   :fonts {:env "TIMBRE_DEFAULT_STACKTRACE_FONTS" :value "{}"}
-   :log-level {:env "TIMBRE_LEVEL" :value ":info"}
-   :site-title {:env "SMEAGOL_SITE_TITLE" :value "DomainDrivenArchitecture"}
-   :default-locale {:env "SMEAGOL_DEFAULT_LOCALE" :value "en-GB"}
-   ;; TODO unify with httpd
-   :port {:env "PORT" :value "8080"}})
-
-
-(def smeagol-releases "https://api.github.com/repos/DomainDrivenArchitecture/smeagol/releases")
-
-;; TODO maybe search by label? can travis specify content-type?
-(s/defn jar-asset?
-  [asset :- ReleaseAsset]
-  (-> asset :content_type (= "application/x-java-archive")))
-
-(s/defn uberjar-release-asset ; :- ReleaseAsset
-  []
-  (->> (http/get smeagol-releases {:as :json})
-       :body
-       (filter #(some jar-asset? (:assets %)))
-       first
-       :assets
-       (filter jar-asset?)
-       first))
-
-
-(s/defn uberjar-infra
-  [smeagol-parent-dir :- s/Str
-   release-asset :- ReleaseAsset]
-  (let [{:keys [name size browser_download_url]} release-asset]
-    {:path (path-join smeagol-parent-dir name)
-     :url browser_download_url
-     :size size}))
+  {:passwd (path-join root "passwd.edn")
+   :config-edn (path-join root "config.edn")})
 
 (s/defn smeagol-infra-configuration
   [facility :- s/Keyword
-   repo-name :- s/Str
-   passwd :- SmeagolPasswdResolved]
+   owner :- s/Keyword
+   content-dir :- s/Str
+   passwd :- SmeagolPasswdResolved
+   port :- s/Num]
   (let [smeagol-owner "smeagol"
         smeagol-parent-dir (path-join "/home" smeagol-owner)
         uberjar-config {:path "/usr/local/lib/smeagol/smeagol-1.0.2-SNAPSHOT-standalone.jar"
                         :url "https://github.com/DomainDrivenArchitecture/smeagol/releases/download/1.0.2-snap1/smeagol-1.0.2-SNAPSHOT-standalone.jar"
                         :md5-url "https://github.com/DomainDrivenArchitecture/smeagol/releases/download/1.0.2-snap1/smeagol-1.0.2-SNAPSHOT-standalone.jar.md5"}]
 
-        ;{:keys [path] :as uberjar-config} (uberjar-infra smeagol-parent-dir (uberjar-release-asset))]
     {facility
      {:passwd passwd
       :owner smeagol-owner
+      :content-dir content-dir
       :uberjar uberjar-config
-      :env (environment smeagol-parent-dir)}}))
-    ; TODO: make things as simple as possible - just download always
-    ;serverspec-infra/facility
-     ;{:file-fact {:uberjar {:path path}}}})) ;; TODO make use of `:uberjar` kw in infra/download-uberjar
+      :port port
+      :configs (config-locations "/etc/smeagol")}}))
