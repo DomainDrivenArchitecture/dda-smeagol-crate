@@ -1,7 +1,8 @@
-{:user-passwd {:plain "xxx"}
- :user-ssh {:ssh-authorized-keys [{:plain "ssh-rsa AAAA..LL comment"}]
-            :ssh-key {:public-key {:plain "ssh-rsa AAAA..LL comment"}
-                      :private-key {:plain "SOME_PRIVATE_SSH_KEY"}}}
+{:user {:name :smeagol
+        :passwd {:plain "xxx"}
+        :ssh {:ssh-authorized-keys [{:plain "ssh-rsa AAAA..LL comment"}]
+              :ssh-key {:public-key {:plain "ssh-rsa AAAA..LL comment"}
+                        :private-key {:plain "SOME_PRIVATE_SSH_KEY"}}}}
  :git-credential {:host "github.com"
                   :protocol :ssh
                   :user-name {:plain "smeagol"}}
