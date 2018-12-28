@@ -46,8 +46,10 @@
 
 (s/defn smeagol-infra-configuration
   [facility :- s/Keyword
-   repo-name :- s/Str
-   passwd :- SmeagolPasswdResolved]
+   owner :- s/Keyword
+   content-dir :- s/Str
+   passwd :- SmeagolPasswdResolved
+   port :- s/Num]
   (let [smeagol-owner "smeagol"
         smeagol-parent-dir (path-join "/home" smeagol-owner)
         uberjar-config {:path "/usr/local/lib/smeagol/smeagol-1.0.2-SNAPSHOT-standalone.jar"
@@ -57,6 +59,7 @@
     {facility
      {:passwd passwd
       :owner smeagol-owner
+      :content-dir content-dir
       :uberjar uberjar-config
-      :port 8080
+      :port port
       :configs (config-locations "/etc/smeagol")}}))

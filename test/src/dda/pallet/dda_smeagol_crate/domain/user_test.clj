@@ -22,10 +22,11 @@
 (s/set-fn-validation! true)
 
 (def user-domain
-  {:input {:user-password "xxx"
-           :user-ssh {:ssh-authorized-keys ["ssh-rsa AAAA..LL comment"]
-                      :ssh-key {:public-key "ssh-rsa AAAA..LL comment"
-                                :private-key "SOME_PRIVATE_SSH_KEY"}}}
+  {:input {:user {:name :smeagol
+                  :password "xxx"
+                  :ssh {:ssh-authorized-keys ["ssh-rsa AAAA..LL comment"]
+                        :ssh-key {:public-key "ssh-rsa AAAA..LL comment"
+                                  :private-key "SOME_PRIVATE_SSH_KEY"}}}}
    :output {:smeagol
             {:clear-password "xxx",
              :settings #{:bashrc-d},
@@ -39,5 +40,6 @@
   (testing
     (is (= (:output user-domain)
            (sut/domain-configuration
-             (get-in user-domain [:input :user-password])
-             (get-in user-domain [:input :user-ssh]))))))
+             (get-in user-domain [:input :user :name])
+             (get-in user-domain [:input :user :password])
+             (get-in user-domain [:input :user :ssh]))))))

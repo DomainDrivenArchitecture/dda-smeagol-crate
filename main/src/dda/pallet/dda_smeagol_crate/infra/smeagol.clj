@@ -40,13 +40,14 @@
 (def SmeagolInfra
   {:passwd SmeagolPasswd
    :owner s/Str
+   :content-dir s/Str
    :uberjar SmeagolUberjar
    :port s/Num
    :configs {s/Keyword s/Str}})
 
 (s/defn create-smeagol-config
   [config :- SmeagolInfra]
-  (let [{:keys [configs owner]} config
+  (let [{:keys [configs owner content-dir]} config
         {:keys [config-edn passwd]} configs]
     (actions/remote-file
      config-edn
@@ -55,7 +56,7 @@
      :mode "755"
      :content (selmer/render-file
                "config_edn.template"
-               {:content-dir "/home/smeagol/repo/content/dda"
+               {:content-dir content-dir
                 :passwd-path passwd}))))
 
 (s/defn configure-smeagol-users

@@ -17,11 +17,18 @@
 (ns dda.pallet.dda-smeagol-crate.domain.git
   (:require
     [schema.core :as s]
-    [dda.pallet.dda-git-crate.domain :as git-domain]))
+    [dda.pallet.dda-git-crate.domain :as git-domain]
+    [dda.pallet.dda-git-crate.domain.repo :as git-domain.repo]))
 
 (def Repository git-domain/Repository)
 (def GitCredential git-domain/GitCredential)
 (def GitCredentialResolved git-domain/GitCredentialResolved)
+
+(s/defn repo-directory-name
+  [user-name :- s/Keyword
+   repo :- Repository]
+  ;; where comes `:content` aka orga-group (not orga-path)?
+  (git-domain.repo/repo-directory-name user-name :content repo))
 
 (s/defn
   domain-configuration :- git-domain/GitDomainResolved
