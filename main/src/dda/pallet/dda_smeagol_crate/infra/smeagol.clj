@@ -37,7 +37,6 @@
 
 (def SmeagolUberjar {:path s/Str :url s/Str :md5-url s/Str})
 
-; TODO: simplify smeagol-parent-dir and smeagol-dir to one directory
 (def SmeagolInfra
   {:passwd SmeagolPasswd
    :owner s/Str
@@ -74,22 +73,10 @@
   [path :- s/Str]
   (keyword (string/replace path #"[/]" "_")))
 
-; TODO where should it come from?
-(def file-fact-keyword :dda.pallet.dda-serverspec-crate.infra.fact.file/file)
-
 (s/defn download-uberjar
   [owner :- s/Str
    uberjar :- SmeagolUberjar]
-  (let [{:keys [path url md5-url]} uberjar
-        all-facts (crate/get-settings
-                   fact/fact-facility
-                   {:instance-id (crate/target-node)})
-        file-fact (file-fact-keyword all-facts)
-        fact-path (path-to-keyword path)]
-    ;(actions/plan-when (let [{:keys [fact-exist? fact-size-in-bytes] :as actual}
-    ;                         (fact-path (:out @file-fact))
-                         ;; (logging/info (pr-str {:actual actual :expected uberjar}))
-    ;                     (not (and fact-exist? (= fact-size-in-bytes size)))
+  (let [{:keys [path url md5-url]} uberjar]
        (actions/packages :aptitude ["curl"])
        (actions/directory "/usr/local/lib/smeagol"
                           :owner owner
