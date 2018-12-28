@@ -1,6 +1,10 @@
 dist: trusty
 language: clojure
 
+cache:
+  directories:
+  - $HOME/.m2
+
 services:
   - docker
 
