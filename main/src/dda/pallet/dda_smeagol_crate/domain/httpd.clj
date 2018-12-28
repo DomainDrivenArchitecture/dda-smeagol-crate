@@ -30,10 +30,3 @@
    {:domain-name server-fqdn
     :proxy-target-port proxy-port
     :settings settings}})
-
-(s/defn
-  infra-configuration
-  [server-fqdn :- s/Str
-   proxy-port :- s/Str]
-  (httpd-domain/single-proxy-configuration
-   (domain-configuration server-fqdn proxy-port)))
