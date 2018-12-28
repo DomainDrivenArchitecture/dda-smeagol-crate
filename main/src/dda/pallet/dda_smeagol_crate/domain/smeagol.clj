@@ -18,6 +18,7 @@
   (:require
     [schema.core :as s]
     [schema-tools.core :refer [open-schema]]
+    [pallet.script.lib :refer [config-root]]
     [clj-http.client :as http]
     [clojure.string :as string]
     [dda.pallet.commons.secret :as secret]
@@ -41,19 +42,10 @@
   (-> (string/join "/" (vec paths))
       (string/replace ,  #"[\\/]+" "/")))
 
-(s/defn environment
+(s/defn config-locations
   [root :- s/Str]
-  {:passwd {:env "SMEAGOL_PASSWD" :value (path-join root "passwd.edn")}
-   :config-edn {:env "SMEAGOL_CONFIG" :value (path-join root "config.edn")}
-   ;; TODO git-crate infra result?!
-   :content-dir {:env "SMEAGOL_CONTENT_DIR" :value (path-join root "repo" "content" "dda")}
-   :fonts {:env "TIMBRE_DEFAULT_STACKTRACE_FONTS" :value "{}"}
-   :log-level {:env "TIMBRE_LEVEL" :value ":info"}
-   :site-title {:env "SMEAGOL_SITE_TITLE" :value "DomainDrivenArchitecture"}
-   :default-locale {:env "SMEAGOL_DEFAULT_LOCALE" :value "en-GB"}
-   ;; TODO unify with httpd
-   :port {:env "PORT" :value "8080"}})
-
+  {:passwd (path-join root "passwd.edn")
+   :config-edn (path-join root "config.edn")})
 
 (def smeagol-releases "https://api.github.com/repos/DomainDrivenArchitecture/smeagol/releases")
 
@@ -96,7 +88,8 @@
      {:passwd passwd
       :owner smeagol-owner
       :uberjar uberjar-config
-      :env (environment smeagol-parent-dir)}}))
+      :port 8080
+      :configs (config-locations "/etc/smeagol")}}))
     ; TODO: make things as simple as possible - just download always
     ;serverspec-infra/facility
      ;{:file-fact {:uberjar {:path path}}}})) ;; TODO make use of `:uberjar` kw in infra/download-uberjar

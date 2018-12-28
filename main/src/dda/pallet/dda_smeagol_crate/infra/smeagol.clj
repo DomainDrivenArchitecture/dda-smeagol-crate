@@ -21,7 +21,7 @@
     [pallet.crate :as crate]
     [pallet.crate.initd] ;; service-supervisor impl
     [pallet.crate.service :refer [service-supervisor-config service-supervisor]]
-    [pallet.script.lib :refer [etc-init]]
+    [pallet.script.lib :refer [etc-init config-root]]
     [selmer.parser :as selmer]
     [pallet.actions :as actions]
     [clojure.tools.logging :as logging]
@@ -36,36 +36,35 @@
   {s/Keyword SmeagolPasswdUser})
 
 (def SmeagolUberjar {:path s/Str :url s/Str :md5-url s/Str})
-(def SmeagolEnv {:env s/Str :value s/Str})
 
 ; TODO: simplify smeagol-parent-dir and smeagol-dir to one directory
 (def SmeagolInfra
   {:passwd SmeagolPasswd
    :owner s/Str
    :uberjar SmeagolUberjar
-   :env {s/Keyword SmeagolEnv}})
+   :port s/Num
+   :configs {s/Keyword s/Str}})
 
 (s/defn create-smeagol-config
   [config :- SmeagolInfra]
-  (let [{:keys [env owner passwd]} config
-        {:keys [config-edn passwd content-dir]} env
-        config-edn-path (:value config-edn)]
+  (let [{:keys [configs owner]} config
+        {:keys [config-edn passwd]} configs]
     (actions/remote-file
-     config-edn-path
+     config-edn
      :literal true
      :owner owner
      :mode "755"
      :content (selmer/render-file
                "config_edn.template"
-               {:content-dir (:value content-dir)
-                :passwd-path (:value passwd)}))))
+               {:content-dir "/home/smeagol/repo/content/dda"
+                :passwd-path passwd}))))
 
 (s/defn configure-smeagol-users
-  [env :- SmeagolEnv
+  [passwd-path :- s/Str
    owner :- s/Str
    passwd :- SmeagolPasswd]
   (actions/remote-file
-   (:value env)
+   passwd-path
    :literal true
    :owner owner
    :mode "755"
@@ -101,16 +100,11 @@
                             :md5-url md5-url
                             :owner owner)))
 
-(s/defn ->env-str
-  [envs :- [SmeagolEnv]]
-  (string/join " "
-               (map #(str (:env %) "=" (:value %)) envs)))
-
 (s/defn initd-script
-  [env :- {s/Keyword SmeagolEnv}
+  [config-edn :- s/Str
+   port :- s/Num
    uberjar :- SmeagolUberjar]
-  (let [env-str (-> env vals ->env-str)
-        jar-path (:path uberjar)]
+  (let [jar-path (:path uberjar)]
     (actions/remote-file
      (str (etc-init) "/" "smeagol")
      :literal true
@@ -118,30 +112,33 @@
      :mode "755"
      :content (selmer/render-file
                "smeagol-initd.template"
-               {:env-str env-str
+               {:config-edn config-edn
+                :port port
                 :jar-path jar-path}))))
 
-(s/defn smeagol-service
-  [env uberjar]
-  (do
-    (service-supervisor ;-config
-     :initd
-     {:service-name "smeagol"}
-     ;; TODO leave only `service-supervisor-config`, place action in proper phase
-     {:action :restart})))
+(s/defn restart-smeagol-service
+  []
+  (service-supervisor
+   :initd
+   {:service-name "smeagol"}
+   {:action :restart}))
 
-;; TODO ugly imperative style
+(s/defn create-config-dir
+  [owner :- s/Str]
+  (actions/directory
+   (str (config-root) "/" "smeagol")
+   :owner owner))
+
 (s/defn install-smeagol
   [config :- SmeagolInfra]
-  (let [{:keys [uberjar passwd owner env]} config]
-    ;; TODO shared :owner like `with-action-options`?!
+  (let [{:keys [uberjar passwd owner configs port]} config]
     (download-uberjar owner uberjar)
-    (initd-script env uberjar)
-    (smeagol-service (vals env) uberjar)))
+    (create-config-dir owner)
+    (initd-script (:config-edn configs) port uberjar)))
 
 (s/defn configure-smeagol
   [config :- SmeagolInfra]
-  (let [{:keys [uberjar passwd owner env]} config]
-    ;; TODO shared :owner like `with-action-options`?!
+  (let [{:keys [uberjar passwd owner configs]} config]
     (create-smeagol-config config)
-    (configure-smeagol-users (:passwd env) owner passwd)))
+    (configure-smeagol-users (:passwd configs) owner passwd)
+    (restart-smeagol-service)))
