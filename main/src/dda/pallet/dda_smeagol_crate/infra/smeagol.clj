@@ -90,6 +90,7 @@
 
 (s/defn initd-script
   [config-edn :- s/Str
+   owner :- s/Str
    port :- s/Num
    uberjar :- SmeagolUberjar]
   (let [jar-path (:path uberjar)]
@@ -101,6 +102,7 @@
      :content (selmer/render-file
                "smeagol-initd.template"
                {:config-edn config-edn
+                :owner owner
                 :port port
                 :jar-path jar-path}))))
 
@@ -122,7 +124,7 @@
   (let [{:keys [uberjar passwd owner configs port]} config]
     (download-uberjar owner uberjar)
     (create-config-dir owner)
-    (initd-script (:config-edn configs) port uberjar)))
+    (initd-script (:config-edn configs) owner port uberjar)))
 
 (s/defn configure-smeagol
   [config :- SmeagolInfra]
