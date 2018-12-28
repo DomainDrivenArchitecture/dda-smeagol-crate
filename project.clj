@@ -4,9 +4,9 @@
   :license {:name "Apache License, Version 2.0"
             :url "https://www.apache.org/licenses/LICENSE-2.0.html"}
   :dependencies [[dda/dda-pallet "2.2.2"]
-                 [dda/dda-git-crate "2.1.4-SNAPSHOT"]
-                 [dda/dda-httpd-crate "2.1.0-SNAPSHOT"]
-                 [dda/dda-user-crate "1.0.6-SNAPSHOT"]
+                 [dda/dda-git-crate "2.1.4"]
+                 [dda/dda-httpd-crate "2.1.0"]
+                 [dda/dda-user-crate "1.0.6"]
                  [clj-http "3.9.1"]
                  [cheshire "5.8.1"]]
   :target-path "target/%s/"
