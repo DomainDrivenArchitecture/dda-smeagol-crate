@@ -50,16 +50,13 @@
    content-dir :- s/Str
    passwd :- SmeagolPasswdResolved
    port :- s/Num]
-  ;;TODO: If we've configurable user, hardcoded owner will not be a good idea ...
-  (let [smeagol-owner "smeagol"
-        smeagol-parent-dir (path-join "/home" smeagol-owner)
-        uberjar-config {:path "/usr/local/lib/smeagol/smeagol-1.0.2-SNAPSHOT-standalone.jar"
+  (let [uberjar-config {:path "/usr/local/lib/smeagol/smeagol-1.0.2-SNAPSHOT-standalone.jar"
                         :url "https://github.com/DomainDrivenArchitecture/smeagol/releases/download/1.0.2-snap1/smeagol-1.0.2-SNAPSHOT-standalone.jar"
                         :md5-url "https://github.com/DomainDrivenArchitecture/smeagol/releases/download/1.0.2-snap1/smeagol-1.0.2-SNAPSHOT-standalone.jar.md5"}]
 
     {facility
      {:passwd passwd
-      :owner smeagol-owner
+      :owner (name owner)
       :content-dir content-dir
       :uberjar uberjar-config
       :port port

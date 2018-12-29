@@ -1,3 +1,0 @@
-; TODO: Fill in users from configuration
-{:admin {:password "admin" :email "admin@localhost" :admin true}
- :adam {:password "secret" :email "adam@localhost"}}

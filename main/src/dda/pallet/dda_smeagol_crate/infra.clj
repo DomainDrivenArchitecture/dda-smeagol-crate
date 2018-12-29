@@ -17,20 +17,27 @@
 (ns dda.pallet.dda-smeagol-crate.infra
   (:require
     [schema.core :as s]
+    [clojure.tools.logging :as logging]
+    [pallet.actions :as actions]
     [dda.pallet.core.infra :as core-infra]
-    [dda.pallet.dda-smeagol-crate.infra.clojure :as clj]
     [dda.pallet.dda-smeagol-crate.infra.smeagol :as smeagol]))
 
 (def facility :dda-smeagol)
 
 (def SmeagolInfra smeagol/SmeagolInfra)
 
+(defn- install-java-8
+  [facility]
+  (actions/as-action
+   (logging/info (str facility "-install system: openjdk-8")))
+  (actions/packages :aptitude ["openjdk-8-jdk"]))
+
 (s/defmethod core-infra/dda-init facility
   [core-infra config])
 
 (s/defmethod core-infra/dda-install facility
   [core-infra config]
-  (clj/install-system facility)
+  (install-java-8 facility)
   (smeagol/install-smeagol config))
 
 (s/defmethod core-infra/dda-configure facility

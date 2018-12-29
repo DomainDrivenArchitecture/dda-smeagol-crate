@@ -22,7 +22,8 @@
 (s/set-fn-validation! true)
 
 (def git-domain
-  {:input {:git-credential {:host "github.com"
+  {:input {:user-name :smeagol
+           :git-credential {:host "github.com"
                             :protocol :https
                             :user-name "smeagol"}
            :git-content-repo {:host "github.com"
@@ -44,6 +45,7 @@
   (testing
     (is (= (:output git-domain)
            (sut/domain-configuration
+             (get-in git-domain [:input :user-name])
              "domain"
              (get-in git-domain [:input :git-credential])
              (get-in git-domain [:input :git-content-repo]))))))
