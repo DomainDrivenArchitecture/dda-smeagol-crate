@@ -46,8 +46,8 @@
 (s/defn ^:always-validate
   git-domain-configuration
   [domain-config :- SmeagolDomainResolved]
-  (let [{:keys [git-credential git-content-repo server-fqdn]} domain-config]
-    (git/domain-configuration server-fqdn git-credential git-content-repo)))
+  (let [{:keys [git-credential git-content-repo server-fqdn user]} domain-config]
+    (git/domain-configuration (:name user) server-fqdn git-credential git-content-repo)))
 
 (def default-service-port 8080)
 

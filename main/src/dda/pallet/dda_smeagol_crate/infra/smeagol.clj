@@ -35,7 +35,13 @@
 (def SmeagolPasswd
   {s/Keyword SmeagolPasswdUser})
 
-(def SmeagolUberjar {:path s/Str :url s/Str :md5-url s/Str})
+(def Path s/Str)
+
+(def SmeagolUberjar {:path Path :url s/Str :md5-url s/Str})
+
+(def SmeagolConfigs
+  {:passwd Path
+   :config-edn Path})
 
 (def SmeagolInfra
   {:passwd SmeagolPasswd
@@ -43,7 +49,7 @@
    :content-dir s/Str
    :uberjar SmeagolUberjar
    :port s/Num
-   :configs {s/Keyword s/Str}})
+   :configs SmeagolConfigs})
 
 (s/defn create-smeagol-config
   [config :- SmeagolInfra]
@@ -54,11 +60,15 @@
      :literal true
      :owner owner
      :mode "755"
-     ;; TODO: wwhy do we use selmer here instead of writing edn directly?
-     :content (selmer/render-file
-               "config_edn.template"
-               {:content-dir content-dir
-                :passwd-path passwd}))))
+     :content {:site-title     "DomainDrivenArchitecture"
+               :default-locale "en-GB"
+               :content-dir    content-dir
+               :passwd         passwd
+               :log-level      :info
+               :formatters     {"vega"         'smeagol.formatting/process-vega
+                                "vis"          'smeagol.formatting/process-vega
+                                "mermaid"      'smeagol.formatting/process-mermaid
+                                "backticks"    'smeagol.formatting/process-backticks}})))
 
 (s/defn configure-smeagol-users
   [passwd-path :- s/Str
@@ -69,13 +79,7 @@
    :literal true
    :owner owner
    :mode "755"
-   ;; TODO: can we remove passwd_edn.template ?
    :content passwd))
-
-;; TODO: this function is no longer used - remove ?
-(s/defn path-to-keyword :- s/Keyword
-  [path :- s/Str]
-  (keyword (string/replace path #"[/]" "_")))
 
 (s/defn download-uberjar
   [owner :- s/Str
@@ -133,6 +137,5 @@
   [config :- SmeagolInfra]
   (let [{:keys [uberjar passwd owner configs]} config]
     (create-smeagol-config config)
-    ;; TODO: Here we demand a key :passwd in configs but we've neither documentation nor validation ... thats a "runtime-suprise" gift ;-)
     (configure-smeagol-users (:passwd configs) owner passwd)
     (restart-smeagol-service)))

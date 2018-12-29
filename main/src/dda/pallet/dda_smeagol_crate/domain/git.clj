@@ -33,21 +33,12 @@
 
 (s/defn
   domain-configuration :- git-domain/GitDomainResolved
-  [domain :- s/Str
+  [user-name :- s/Keyword
+   domain :- s/Str
    git-credential :- GitCredentialResolved
    git-content-repo :- Repository]
-  {:smeagol
-   ;; TODO: if users name is configurable hardcoded email is wrong - isn't it?
-   {:user-email (str "smeagol@" domain)
+  {user-name
+   {:user-email (str (name user-name) "@" domain)
     :credential [git-credential]
     :repo {}
     :synced-repo {:content [git-content-repo]}}})
-
-(s/defn
-  infra-configuration
-  [domain :- s/Str
-   git-credential :- GitCredentialResolved
-   git-content-repo :- Repository]
-  (git-domain/infra-configuration
-    (domain-configuration
-      domain git-credential git-content-repo)))
