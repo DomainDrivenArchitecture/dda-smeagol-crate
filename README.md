@@ -18,7 +18,7 @@ This crate provisions over ssh or local a [smeagol](https://github.com/journeyma
 Part of the installation is:
 * apache http proxy with letsencrypt & ssl termination
 * a smeagol user having ssh credentials
-* a git repoy wich contains wiki contents. Repo can be autosynced using ssh
+* a git repoy wich contains wiki contents. Repo can be autosynced using smeagols user ssh
 * the smeagol server itself
 * smeagol users & password salt are configurable
 
@@ -58,25 +58,27 @@ Example content of the file, `targets.edn`:
 ### Smeagol config example
 Example content of the file, `smeagol.edn`:
 ```clojure
-{:user-passwd {:plain "xxx"}                                  ; smeagol user pwd on os level
- :user-ssh
-  {:ssh-authorized-keys [{:plain "ssh-rsa AAAA..LL comment"}] ; ssh authorized keys
-   :ssh-key {:public-key {:plain "ssh-rsa AAAA..LL comment"}  ; ssh-key for git sync
-             :private-key {:plain "SOME_PRIVATE_SSH_KEY"}}}
+{:user {:name :smeagol
+        :passwd {:plain "xxx"}                                  ; smeagol user pwd on os level
+        :ssh
+        {:ssh-authorized-keys [{:plain "ssh-rsa AAAA..LL comment"}] ; ssh authorized keys
+         :ssh-key {:public-key {:plain "ssh-rsa AAAA..LL comment"}  ; ssh-key for git sync
+                   :private-key {:plain "SOME_PRIVATE_SSH_KEY"}}}}
  :git-credential
   {:host "github.com"                                         ; credentials for content repo
    :protocol :ssh
    :user-name {:plain "smeagol"}}
  :git-content-repo                                            ; the content repo spec
   {:host "github.com"                                         ; e.g. for github. Gitlab or gitblit will also work.
-   :repo-name "a-private-repo"
+   :orga-path "DomainDrivenArchitecture"
+   :repo-name "dda"
    :protocol :ssh
    :server-type :github}
  :server-fqdn "a.server.name"                                 ; the httpd server name
- :smeagol-passwd
-    {:admin {:admin true,                                     ; smeagol users
-             :email "admin@localhost",
-             :password {:plain "admin"}}}}
+ :smeagol-users
+  {:admin {:admin true,                                       ; smeagol users
+           :email "admin@localhost",
+           :password "admin" {:plain "admin"}}}}
 ```
 
 
