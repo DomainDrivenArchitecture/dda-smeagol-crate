@@ -1,44 +1,102 @@
 #!/bin/sh
+### BEGIN INIT INFO
+# Provides:          smeagol
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start daemon at boot time
+# Description:       Enable service provided by daemon.
+### END INIT INFO
+
+dir=""
+cmd="PORT={{port}} SMEAGOL_CONFIG="{{config-edn}}" nohup java -jar {{jar-path}}"
+user="{{owner}}"
+
 service_name=smeagol
-pid_path_name=/tmp/${service_name}.pid
+pid_file=/tmp/${service_name}.pid
 stdout_log="/var/log/${service_name}.log"
 stderr_log="/var/log/${service_name}.err"
 
+get_pid() {
+    cat "$pid_file"
+}
+
+is_running() {
+    [ -f "$pid_file" ] && ps -p `get_pid` > /dev/null 2>&1
+}
+
+
 case $1 in
     start)
-        echo "Starting $service_name ..."
-        if [ ! -f $pid_path_name ]; then
-            PORT={{port}} SMEAGOL_CONFIG="{{config-edn}}" nohup sudo -u {{owner}} --preserve-env="PORT,SMEAGOL_CONFIG" java -jar {{jar-path}} 2>> /dev/null >> /dev/null &
-            echo $! > $pid_path_name
-            echo "$service_name started ..."
-        else
+        if is_running; then
             echo "$service_name is already running ..."
+        else
+            echo "Starting $service_name"
+            cd "$dir"
+            if [ -z "$user" ]; then
+                sudo $cmd >> "$stdout_log" 2>> "$stderr_log" &
+            else
+                sudo -u "$user" $cmd >> "$stdout_log" 2>> "$stderr_log" &
+            fi
+            echo $! > "$pid_file"
+            if ! is_running; then
+                echo "Unable to start, see $stdout_log and $stderr_log"
+                exit 1
+            fi
+            echo "$service_name started ..."
         fi
     ;;
     stop)
-        if [ -f $pid_path_name ]; then
-            PID=$(cat $pid_path_name);
-            echo "$service_name stoping ..."
-            kill $PID;
-            echo "$service_name stopped ..."
-            rm $pid_path_name
-        else
-            echo "$service_name is not running ..."
-        fi
+      if is_running; then
+          echo -n "Stopping $service_name.."
+          kill `get_pid`
+          for i in 1 2 3 4 5 6 7 8 9 10
+          # for i in `seq 10`
+          do
+              if ! is_running; then
+                  break
+              fi
+
+              echo -n "."
+              sleep 1
+          done
+          echo
+
+          if is_running; then
+              echo "Not stopped; may still be shutting down or shutdown may have failed"
+              exit 1
+          else
+              echo "Stopped"
+              if [ -f "$pid_file" ]; then
+                  rm "$pid_file"
+              fi
+          fi
+      else
+          echo "Not running"
+      fi
     ;;
     restart)
-        if [ -f $pid_path_name ]; then
-            PID=$(cat $pid_path_name);
-            echo "$service_name stopping ...";
-            kill $PID;
-            echo "$service_name stopped ...";
-            rm $pid_path_name
-            echo "$service_name starting ..."
-            PORT={{port}} SMEAGOL_CONFIG="{{config-edn}}" nohup sudo -u {{owner}} --preserve-env="PORT,SMEAGOL_CONFIG" java -jar {{jar-path}} 2>> /dev/null >> /dev/null &
-            echo $! > $pid_path_name
-            echo "$service_name started ..."
-        else
-            echo "$service_name is not running ..."
-        fi
+      $0 stop
+      if is_running; then
+          echo "Unable to stop, will not attempt to start"
+          exit 1
+      fi
+      $0 start
+    ;;
+    status)
+      if is_running; then
+          echo "Running"
+      else
+          echo "Stopped"
+          exit 1
+      fi
+    ;;
+    *)
+      echo "Usage: $0 {start|stop|restart|status}"
+      exit 1
     ;;
 esac
+
+
+exit 0
