@@ -9,9 +9,13 @@
 # Description:       Enable service provided by daemon.
 ### END INIT INFO
 
+export PORT={{port}}
+export SMEAGOL_CONFIG={{config-edn}}
+env_to_preserve="PORT,SMEAGOL_CONFIG"
 dir=""
-cmd="PORT={{port}} SMEAGOL_CONFIG="{{config-edn}}" nohup java -jar {{jar-path}}"
+cmd="nohup java -jar {{jar-path}}"
 user="{{owner}}"
+
 
 service_name=smeagol
 pid_file=/tmp/${service_name}.pid
@@ -35,9 +39,9 @@ case $1 in
             echo "Starting $service_name"
             cd "$dir"
             if [ -z "$user" ]; then
-                sudo $cmd >> "$stdout_log" 2>> "$stderr_log" &
+                sudo --preserve-env="$env_to_preserve" $cmd >> "$stdout_log" 2>> "$stderr_log" &
             else
-                sudo -u "$user" $cmd >> "$stdout_log" 2>> "$stderr_log" &
+                sudo -u "$user" --preserve-env="$env_to_preserve" $cmd >> "$stdout_log" 2>> "$stderr_log" &
             fi
             echo $! > "$pid_file"
             if ! is_running; then
