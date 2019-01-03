@@ -1,42 +1,44 @@
 #!/bin/sh
-SERVICE_NAME=smeagol
-PID_PATH_NAME=/tmp/smeagol.pid
+service_name=smeagol
+pid_path_name=/tmp/${service_name}.pid
+stdout_log="/var/log/${service_name}.log"
+stderr_log="/var/log/${service_name}.err"
 
 case $1 in
     start)
-        echo "Starting $SERVICE_NAME ..."
-        if [ ! -f $PID_PATH_NAME ]; then
+        echo "Starting $service_name ..."
+        if [ ! -f $pid_path_name ]; then
             PORT={{port}} SMEAGOL_CONFIG="{{config-edn}}" nohup sudo -u {{owner}} --preserve-env="PORT,SMEAGOL_CONFIG" java -jar {{jar-path}} 2>> /dev/null >> /dev/null &
-            echo $! > $PID_PATH_NAME
-            echo "$SERVICE_NAME started ..."
+            echo $! > $pid_path_name
+            echo "$service_name started ..."
         else
-            echo "$SERVICE_NAME is already running ..."
+            echo "$service_name is already running ..."
         fi
     ;;
     stop)
-        if [ -f $PID_PATH_NAME ]; then
-            PID=$(cat $PID_PATH_NAME);
-            echo "$SERVICE_NAME stoping ..."
+        if [ -f $pid_path_name ]; then
+            PID=$(cat $pid_path_name);
+            echo "$service_name stoping ..."
             kill $PID;
-            echo "$SERVICE_NAME stopped ..."
-            rm $PID_PATH_NAME
+            echo "$service_name stopped ..."
+            rm $pid_path_name
         else
-            echo "$SERVICE_NAME is not running ..."
+            echo "$service_name is not running ..."
         fi
     ;;
     restart)
-        if [ -f $PID_PATH_NAME ]; then
-            PID=$(cat $PID_PATH_NAME);
-            echo "$SERVICE_NAME stopping ...";
+        if [ -f $pid_path_name ]; then
+            PID=$(cat $pid_path_name);
+            echo "$service_name stopping ...";
             kill $PID;
-            echo "$SERVICE_NAME stopped ...";
-            rm $PID_PATH_NAME
-            echo "$SERVICE_NAME starting ..."
+            echo "$service_name stopped ...";
+            rm $pid_path_name
+            echo "$service_name starting ..."
             PORT={{port}} SMEAGOL_CONFIG="{{config-edn}}" nohup sudo -u {{owner}} --preserve-env="PORT,SMEAGOL_CONFIG" java -jar {{jar-path}} 2>> /dev/null >> /dev/null &
-            echo $! > $PID_PATH_NAME
-            echo "$SERVICE_NAME started ..."
+            echo $! > $pid_path_name
+            echo "$service_name started ..."
         else
-            echo "$SERVICE_NAME is not running ..."
+            echo "$service_name is not running ..."
         fi
     ;;
 esac
