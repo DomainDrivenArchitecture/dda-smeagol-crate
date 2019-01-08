@@ -61,6 +61,7 @@
      :owner owner
      :mode "755"
      :content {:site-title     "DomainDrivenArchitecture"
+               :start-page     "README"
                :default-locale "en-GB"
                :content-dir    content-dir
                :passwd         passwd
