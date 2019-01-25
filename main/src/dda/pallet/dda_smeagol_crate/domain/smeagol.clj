@@ -50,9 +50,9 @@
    content-dir :- s/Str
    passwd :- SmeagolPasswdResolved
    port :- s/Num]
-  (let [uberjar-config {:path "/usr/local/lib/smeagol/smeagol-1.0.2-SNAPSHOT-standalone.jar"
-                        :url "https://github.com/DomainDrivenArchitecture/smeagol/releases/download/1.0.2-snap1/smeagol-1.0.2-SNAPSHOT-standalone.jar"
-                        :md5-url "https://github.com/DomainDrivenArchitecture/smeagol/releases/download/1.0.2-snap1/smeagol-1.0.2-SNAPSHOT-standalone.jar.md5"}]
+  (let [uberjar-config {:path "/usr/local/lib/smeagol/smeagol-standalone.jar"
+                        :url "https://github.com/DomainDrivenArchitecture/smeagol/releases/download/1.0.3-snap3/smeagol-standalone.jar"
+                        :md5-url "https://github.com/DomainDrivenArchitecture/smeagol/releases/download/1.0.3-snap3/smeagol-standalone.jar.md5"}]
 
     {facility
      {:passwd passwd
